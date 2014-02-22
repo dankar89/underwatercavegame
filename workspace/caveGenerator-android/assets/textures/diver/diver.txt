@@ -1,0 +1,60 @@
+diver.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+diver
+  rotate: false
+  xy: 2, 22
+  size: 20, 8
+  orig: 20, 8
+  offset: 0, 0
+  index: 2
+diver
+  rotate: false
+  xy: 2, 12
+  size: 20, 8
+  orig: 20, 8
+  offset: 0, 0
+  index: 3
+diver
+  rotate: false
+  xy: 2, 32
+  size: 20, 8
+  orig: 20, 8
+  offset: 0, 0
+  index: 1
+diver2
+  rotate: false
+  xy: 2, 62
+  size: 20, 8
+  orig: 20, 8
+  offset: 0, 0
+  index: 2
+diver2
+  rotate: false
+  xy: 2, 72
+  size: 20, 8
+  orig: 20, 8
+  offset: 0, 0
+  index: 1
+diver2
+  rotate: false
+  xy: 2, 42
+  size: 20, 8
+  orig: 20, 8
+  offset: 0, 0
+  index: 4
+diver2
+  rotate: false
+  xy: 2, 52
+  size: 20, 8
+  orig: 20, 8
+  offset: 0, 0
+  index: 3
+diver
+  rotate: false
+  xy: 2, 2
+  size: 20, 8
+  orig: 20, 8
+  offset: 0, 0
+  index: 4
