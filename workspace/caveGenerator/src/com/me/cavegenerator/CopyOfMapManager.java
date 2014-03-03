@@ -24,6 +24,8 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.me.cavegenerator.Cell.CellType;
 import com.me.cavegenerator.Cell.WallType;
+
+import common.GameConstants;
 import common.GameResources;
 import common.Globals;
 
@@ -98,12 +100,12 @@ public class CopyOfMapManager extends InputAdapter {
 
 		this.map = new TiledMap();
 
-		float unitScale = 1f / (float) Globals.TILE_SIZE;
+		float unitScale = 1f / (float) GameConstants.TILE_SIZE;
 		mapRenderer = new OrthogonalTiledMapRenderer(map, unitScale, mapBatch);
 
 		tiledMapCamera = new OrthographicCamera();
-		tiledMapCamera.setToOrtho(true, Gdx.graphics.getWidth() / Globals.TILE_SIZE,
-				Gdx.graphics.getHeight() / Globals.TILE_SIZE);
+		tiledMapCamera.setToOrtho(true, Gdx.graphics.getWidth() / GameConstants.TILE_SIZE,
+				Gdx.graphics.getHeight() / GameConstants.TILE_SIZE);
 
 		tiledMapCamera.update();
 	}

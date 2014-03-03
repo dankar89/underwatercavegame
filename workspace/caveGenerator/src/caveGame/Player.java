@@ -5,10 +5,12 @@ import java.util.ArrayList;
 import net.dermetfan.utils.libgdx.box2d.Box2DUtils;
 import net.dermetfan.utils.libgdx.graphics.AnimatedBox2DSprite;
 import net.dermetfan.utils.libgdx.graphics.AnimatedSprite;
+import net.dermetfan.utils.libgdx.graphics.Box2DSprite;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
@@ -18,6 +20,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import common.GameConstants;
 import common.GameResources;
 import common.Globals;
 
@@ -31,6 +34,7 @@ public class Player extends InputAdapter {
 	Animation swimAnimation;
 	AnimatedSprite animatedSprite;
 	AnimatedBox2DSprite animatedBox2dSprite;
+	Box2DSprite box2dSprite;
 	private boolean isMoving;
 
 	private Vector2 movement;
@@ -44,25 +48,25 @@ public class Player extends InputAdapter {
 	// DEBUG STUFF
 	public static ArrayList<String> debugStrings = new ArrayList<String>();
 
-	private static float SCALE = 2; // needed to make the "pixels" to scale
+	private static float SCALE = 4; // needed to make the "pixels" to scale
 
 	public Player(World world, Vector2 startPos) {
 		angle = 0;
 		flashlightEnabled = false;
 		isMoving = false;
-		speed = 2f / Globals.PIXELS_PER_METER;
+		speed = 1f;
 		rotationSpeed = 3f;
 		movement = Vector2.Zero;
-		pos = new Vector2(startPos.x, startPos.y);
 		oldPos = pos;
 
 		deltaPos = Vector2.Zero;
 
 		bodyDef = new BodyDef();
 		bodyDef.type = BodyType.DynamicBody;
-		bodyDef.position.set(new Vector2((Gdx.graphics.getWidth() / 2)
-				/ Globals.PIXELS_PER_METER, (Gdx.graphics.getHeight() / 2)
-				/ Globals.PIXELS_PER_METER));
+		// bodyDef.position.set(new Vector2((Gdx.graphics.getWidth() / 2)
+		// / GameConstants.TILE_SIZE, (Gdx.graphics.getHeight() / 2)
+		// / GameConstants.TILE_SIZE));
+		bodyDef.position.set(startPos);
 		body = world.createBody(bodyDef);
 
 		swimAnimation = new Animation(1 / 3f, GameResources.diverSprites);
@@ -70,41 +74,38 @@ public class Player extends InputAdapter {
 
 		animatedBox2dSprite = new AnimatedBox2DSprite(new AnimatedSprite(
 				swimAnimation));
+
 		animatedBox2dSprite.setAdjustSize(false);
 		animatedBox2dSprite.setUseOrigin(true);
-		animatedBox2dSprite.setScale(SCALE / Globals.PIXELS_PER_METER);
+
+		animatedBox2dSprite.setScale(SCALE / GameConstants.TILE_SIZE);
 
 		w = animatedBox2dSprite.getWidth();
 		h = animatedBox2dSprite.getHeight();
 
+		animatedBox2dSprite.setOrigin(w / 2, h / 2);
+
 		shape = new PolygonShape();
-		shape.setAsBox(((w / 2) / Globals.PIXELS_PER_METER) * SCALE,
-				((h / 2) / Globals.PIXELS_PER_METER) * SCALE);
+		shape.setAsBox(((w / 2) / GameConstants.TILE_SIZE) * SCALE,
+				((h / 2) / GameConstants.TILE_SIZE) * SCALE);
 
 		fixture = body.createFixture(shape, 50f);
 		shape.dispose();
 
-		animatedBox2dSprite.setOrigin(animatedBox2dSprite.getWidth() / 2,
-				animatedBox2dSprite.getHeight() / 2);
-
 		animatedBox2dSprite.setPosition(
-				(-animatedBox2dSprite.getWidth() / 2)
-						+ (Box2DUtils.width(body) / 2),
-				(-animatedBox2dSprite.getHeight() / 2)
-						+ (Box2DUtils.height(body) / 2));
-
-		body.setUserData(animatedBox2dSprite);
+				(-w / 2) + (Box2DUtils.width(body) / 2),
+				(-h / 2) + (Box2DUtils.height(body) / 2));
 
 		body.setFixedRotation(true);
-		// fixture.setUserData(animatedBox2dSprite);
 
 		animatedBox2dSprite.play();
+
+		body.setUserData(animatedBox2dSprite);
 	}
 
 	public void update(float detla, Vector2 camPos) {
 		animatedBox2dSprite.update(1 / 60f);
-		oldPos = pos;
-
+		
 		if (Gdx.input.isKeyPressed(Keys.LEFT)) {
 			movement.x = -speed;
 		} else if (Gdx.input.isKeyPressed(Keys.RIGHT)) {
@@ -113,46 +114,27 @@ public class Player extends InputAdapter {
 			movement.x = 0;
 
 		if (Gdx.input.isKeyPressed(Keys.UP)) {
-			movement.y = speed;
-		} else if (Gdx.input.isKeyPressed(Keys.DOWN)) {
 			movement.y = -speed;
+		} else if (Gdx.input.isKeyPressed(Keys.DOWN)) {
+			movement.y = speed;
 		} else
 			movement.y = 0;
-
-		// move(movement.x, movement.y);
-//		pos.x += movement.x;
-//		pos.y += movement.y;
 		
-		if(movement.x != 0 || movement.y != 0)
-			body.setLinearVelocity(movement.x, movement.y);
-		else 
-			body.setLinearVelocity(0, 0);
-		
-		System.out.println(body.getPosition());
-//		body.setTransform(camPos, body.getAngle());
-//		Vector2 deltaPos = body.getPosition().sub(camPos);
-//		System.out.println();
+		move(movement.x, movement.y);
 
-		// if (isMoving) {
-		// if (!Gdx.input.isKeyPressed(Keys.DOWN)
-		// && !Gdx.input.isKeyPressed(Keys.UP)
-		// && !Gdx.input.isKeyPressed(Keys.LEFT)
-		// && !Gdx.input.isKeyPressed(Keys.RIGHT)) {
-		// stop();
-		// }
-		// }
-
-		if (Globals.isAndroid)
+		if (GameConstants.isAndroid)
 			flashlightEnabled = true;
 	}
 
-	public void move(float x, float y) {
+	public void move(float mx, float my) {
 		isMoving = true;
 
-		pos.x += x;
-		pos.y += y;
+		if (mx != 0 || my != 0)
+			body.setLinearVelocity(mx, my);
+		else
+			body.setLinearVelocity(0, 0);
 
-		float angleRad = (float) Math.atan2(y, x);
+		float angleRad = (float) Math.atan2(my, mx);
 
 		if (body.getAngle() < angleRad)
 			body.setAngularVelocity(rotationSpeed);
@@ -196,7 +178,7 @@ public class Player extends InputAdapter {
 	}
 
 	public void stop() {
-		// body.setLinearVelocity(0, 0);
+		body.setLinearVelocity(0, 0);
 		body.setAngularVelocity(0);
 		movement = Vector2.Zero;
 		isMoving = false;
@@ -208,6 +190,7 @@ public class Player extends InputAdapter {
 
 	public void draw(SpriteBatch batch) {
 		animatedBox2dSprite.draw(batch, body);
+		// box2dSprite.draw(batch, body);
 		// animatedBox2dSprite.draw(batch, fixture);
 	}
 

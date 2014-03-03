@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
@@ -88,7 +89,7 @@ public class HUD {
 
 	public void draw() {
 
-		if (Globals.isAndroid)
+		if (GameConstants.isAndroid)
 			stage.draw();
 		// hudBatch.begin();
 
@@ -124,12 +125,12 @@ public class HUD {
 		}
 
 		miniMapPlayerSprite.setPosition(miniMapOffsetX + playerPos.x,
-				miniMapOffsetY - playerPos.y);
+				miniMapOffsetY + playerPos.y);
 		miniMapPlayerSprite.draw(minimapBatch);
 		minimapBatch.end();
 	}
 
-	public void drawDebug(Player player, MapManager mapManager) {
+	public void drawDebug(Player player, MapManager mapManager, World world) {
 		hudBatch.begin();
 
 		font.draw(hudBatch,
@@ -143,14 +144,15 @@ public class HUD {
 		font.draw(hudBatch,
 				"angleDeg: " + Math.toDegrees(player.getBody().getAngle()), 20,
 				h - 80);
-		font.draw(hudBatch, "map pos: " + mapManager.getCamera().position, 20,
-				h - 100);
+		 font.draw(hudBatch, "bodies: " + world.getBodyCount(),
+		 20,
+		 h - 100);
 
 		hudBatch.end();
 	}
 
 	public void update(float deltaTime) {
-		if (Globals.isAndroid) {
+		if (GameConstants.isAndroid) {
 			stage.act(deltaTime);
 		} else {
 			// TODO: unfocus touchpad!!!
@@ -167,8 +169,6 @@ public class HUD {
 
 	public void resize(int w, int h) {
 		stage.setViewport(w, h, true);
-//		minimapCamera.update();
 		minimapBatch.setProjectionMatrix(minimapCamera.combined);
-		
 	}
 }

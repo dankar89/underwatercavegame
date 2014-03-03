@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.math.MathUtils;
 
+import common.GameConstants;
 import common.Globals;
 
 public class GameInputProcessor implements InputProcessor {	
@@ -22,8 +23,11 @@ public class GameInputProcessor implements InputProcessor {
 			Globals.lightsEnabled = !Globals.lightsEnabled;
 			break;
 		case Keys.F4:
-			Globals.isAndroid = !Globals.isAndroid;
+			//I know this makes it non-constant... but its for debugging purposes
+			GameConstants.isAndroid = !GameConstants.isAndroid;
 			break;
+		case Keys.F5:
+			Globals.fullscreen = !Globals.fullscreen;
 		case Keys.ESCAPE:
 			Gdx.app.exit();
 			break;
