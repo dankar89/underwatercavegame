@@ -157,7 +157,7 @@ public class CopyOfMapManager extends InputAdapter {
 			this.map = new TiledMap();
 			MapLayers layers = map.getLayers();
 			AtlasRegion tmpRegion;
-			int numOfLayers = 1;
+			int numOfLayers = 2; //1 = background, 2 = middle, 3 = foreground
 			boolean flipX = false;
 			boolean flipY = false;
 

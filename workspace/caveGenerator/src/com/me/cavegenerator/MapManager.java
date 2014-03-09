@@ -1,9 +1,10 @@
 package com.me.cavegenerator;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Random;
+
+import sun.java2d.pipe.SolidTextRenderer;
 
 import caveGame.TileShapeData;
 
@@ -14,21 +15,24 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.maps.MapLayers;
+import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.EdgeShape;
-import com.badlogic.gdx.physics.box2d.JointDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.me.cavegenerator.Cell.CellType;
 import com.me.cavegenerator.Cell.WallType;
+import com.sun.org.apache.xml.internal.serialize.LineSeparator;
+
 import common.GameConstants;
 import common.GameResources;
 
@@ -48,6 +52,7 @@ public class MapManager extends InputAdapter {
 	private SpriteBatch mapBatch;
 
 	private Color tileColor;
+	private float alpha = 1f;
 
 	private ArrayList<Miner> miners = new ArrayList<Miner>();
 	private ArrayList<Miner> newMiners = new ArrayList<Miner>();
@@ -63,7 +68,14 @@ public class MapManager extends InputAdapter {
 
 	private Vector2 playerStartPos;
 
-	// private OrthographicCamera tiledMapCamera;
+	private int[] rockLayerIndex = { GameConstants.BACKGROUND_LAYER_1_INDEX};
+//			GameConstants.BACKGROUND_LAYER_2_INDEX,
+//			GameConstants.BACKGROUND_LAYER_3_INDEX };
+	private int[] waterLayerIndex = {GameConstants.BACKGROUND_LAYER_2_INDEX};
+	private int[] wallLayerIndex = {GameConstants.BACKGROUND_LAYER_3_INDEX};
+	private int[] foregroundLayers = { GameConstants.FOREGROUND_LAYER_1_INDEX };
+
+	private MapLayers layers;
 
 	// BOX2D tmp stuff
 	Body body;
@@ -155,168 +167,224 @@ public class MapManager extends InputAdapter {
 		mapGenerationDone = true;
 	}
 
+	private TiledMapTileLayer createLayer(int layerIndex) {
+		return createLayer(layerIndex, null);
+	}
+
+	private TiledMapTileLayer createLayer(int layerIndex, World world) {
+		TiledMapTileLayer layer = new TiledMapTileLayer(mapWidth, mapHeight,
+				GameConstants.TILE_SIZE, GameConstants.TILE_SIZE);
+
+		String textureName = "noname";
+		String type = "";
+		com.me.cavegenerator.Cell caveCell;
+		ObjectMap<String, TileShapeData> shapeDataMap = null;
+		boolean flipX = false;
+		boolean flipY = false;
+		AtlasRegion tmpRegion = null;
+
+		ArrayList<EdgeShape> lineSegments = null;
+
+		switch (layerIndex) {
+		case GameConstants.BACKGROUND_LAYER_1_INDEX:
+			layer.setName("backgroundLayer1");
+			break;
+		case GameConstants.BACKGROUND_LAYER_2_INDEX:
+			layer.setName("backgroundLayer2");
+			break;
+		case GameConstants.BACKGROUND_LAYER_3_INDEX:
+			layer.setName("backgroundLayer3");
+			shapeDataMap = GameResources.shapeDataMap;
+			lineSegments = new ArrayList<EdgeShape>();
+			break;
+		case GameConstants.FOREGROUND_LAYER_1_INDEX:
+			layer.setName("foregroundLayer1");
+			break;
+		}
+
+		System.out.println("creating layer: " + layer.getName());
+
+		for (int x = 0; x < mapWidth; x++) {
+			for (int y = 0; y < mapHeight; y++) {
+				caveCell = caveMap.getCellAt(x, y);
+
+				if (caveCell.getWallType() != WallType.SOLID) {
+					if (layerIndex == GameConstants.BACKGROUND_LAYER_1_INDEX) { // rocks
+																				// background
+						tmpRegion = GameResources.rockTiles.random();
+						flipX = false;
+						flipY = true;
+						type = "background_rock";
+						layer.setCell(
+								x,
+								y,
+								createCellforTiledMap(tmpRegion, flipX, flipY,
+										type));
+					} else if (layerIndex == GameConstants.BACKGROUND_LAYER_2_INDEX) { // water
+						if (y > 4) {
+							type = "water";
+							if (y == 5) {
+								tmpRegion = GameResources.waterSurfaceTexture;
+								flipX = rnd.nextBoolean();
+								flipY = true;
+
+							} else {
+								tmpRegion = GameResources.waterTexture;
+							}
+							layer.setCell(
+									x,
+									y,
+									createCellforTiledMap(tmpRegion, flipX,
+											flipY, type));
+						}
+					}
+
+				}
+
+				if (caveCell.getCellType() == CellType.WALL
+						|| caveCell.getCellType() == CellType.CORNER_WALL) {
+					if (layerIndex == GameConstants.BACKGROUND_LAYER_3_INDEX
+							&& world != null) { // walls
+						lineSegments.clear();
+
+						if (caveCell.getWallType() == WallType.LEFT) {
+							flipX = true;
+							flipY = rnd.nextBoolean();
+							tmpRegion = GameResources.verticalTiles.random();
+						} else if (caveCell.getWallType() == WallType.LONELY_LEFT) {
+							flipX = false;
+							flipY = rnd.nextBoolean();
+							tmpRegion = GameResources.lonelyVerticalTiles
+									.random();
+						} else if (caveCell.getWallType() == WallType.RIGHT) {
+							flipX = false;
+							flipY = rnd.nextBoolean();
+							tmpRegion = GameResources.verticalTiles.random();
+						} else if (caveCell.getWallType() == WallType.LONELY_RIGHT) {
+							flipX = true;
+							flipY = rnd.nextBoolean();
+							tmpRegion = GameResources.lonelyVerticalTiles
+									.random();
+						} else if (caveCell.getWallType() == WallType.CEILING) {
+							flipX = rnd.nextBoolean();
+							flipY = false;
+							tmpRegion = GameResources.horizontalTiles.random();
+						} else if (caveCell.getWallType() == WallType.LONELY_TOP) {
+							flipX = rnd.nextBoolean();
+							flipY = true;
+							tmpRegion = GameResources.lonelyHorizontalTiles
+									.random();
+						} else if (caveCell.getWallType() == WallType.GROUND) {
+							flipX = rnd.nextBoolean();
+							flipY = true;
+							tmpRegion = GameResources.horizontalTiles.random();
+						} else if (caveCell.getWallType() == WallType.LONELY_BOTTOM) {
+							flipX = rnd.nextBoolean();
+							flipY = false;
+							tmpRegion = GameResources.lonelyHorizontalTiles
+									.random();
+						} else if (caveCell.getWallType() == WallType.LEFT_RIGHT) {
+							flipX = false;
+							flipY = rnd.nextBoolean();
+							tmpRegion = GameResources.thinVerticalTiles
+									.random();
+						} else if (caveCell.getWallType() == WallType.GROUND_CEILING) {
+							flipX = rnd.nextBoolean();
+							flipY = false;
+							tmpRegion = GameResources.thinHorizontalTiles
+									.random();
+						} else if (caveCell.getWallType() == WallType.SOLID) {
+							tmpRegion = GameResources.wallRegion;
+						} else { // corner tiles
+							tmpRegion = GameResources.cornerTiles.random();
+
+							if (caveCell.getWallType() == WallType.UPPER_LEFT_CONVEX) {
+								flipX = false;
+								flipY = false;
+							} else if (caveCell.getWallType() == WallType.UPPER_RIGHT_CONVEX) {
+								flipX = true;
+								flipY = false;
+							} else if (caveCell.getWallType() == WallType.LOWER_RIGHT_CONVEX) {
+								flipX = true;
+								flipY = true;
+							} else if (caveCell.getWallType() == WallType.LOWER_LEFT_CONVEX) {
+								flipX = false;
+								flipY = true;
+							}
+						}
+
+						// create box2d body for the wall
+						if (caveCell.getWallType() != WallType.SOLID) {
+							textureName = tmpRegion.name + "_"
+									+ tmpRegion.index + ".png";
+							createTileBody(world,
+									shapeDataMap.get(textureName), x, y, flipX,
+									flipY);
+						}
+
+						layer.setCell(
+								x,
+								y,
+								createCellforTiledMap(tmpRegion, flipX, flipY,
+										"wall"));
+					}
+				}
+			}
+		}
+
+		return layer;
+	}
+
 	public void createTileMap(World world) {
 		if (this.caveMap.isReady()) {
 			this.map = new TiledMap();
-			MapLayers layers = map.getLayers();
-			AtlasRegion tmpRegion = null;
-			int numOfLayers = 1;
-			boolean flipX = false;
-			boolean flipY = false;
-
-			Cell cell = new Cell();
-			com.me.cavegenerator.Cell caveCell;
-			MyTiledMapTile mapTile = null;
+			layers = map.getLayers();
 
 			if (GameResources.isReady()) {
-				ArrayList<EdgeShape> lineSegments = new ArrayList<EdgeShape>();
+				layers.add(createLayer(GameConstants.BACKGROUND_LAYER_1_INDEX));
+				layers.add(createLayer(GameConstants.BACKGROUND_LAYER_2_INDEX));
+				layers.add(createLayer(GameConstants.BACKGROUND_LAYER_3_INDEX,
+						world));
 
-				ObjectMap<String, TileShapeData> shapeDataMap = GameResources.shapeDataMap;
-				TileShapeData tmpTileShapeData = null;
-				String textureName = "noname";
-
-				for (int i = 0; i < numOfLayers; i++) {
-					TiledMapTileLayer layer = new TiledMapTileLayer(mapWidth,
-							mapHeight, GameConstants.TILE_SIZE,
-							GameConstants.TILE_SIZE);
-
-					for (int x = 0; x < mapWidth; x++) {
-						for (int y = 0; y < mapHeight; y++) {
-							caveCell = caveMap.getCellAt(x, y);
-
-							// if (caveCell.getCellType() != CellType.EMPTY
-							// && caveCell.getWallType() != WallType.SOLID
-							// && caveCell.getWallType() != WallType.NONE) {
-							// if (x >= 98 && x <= 102 && y >= 2 && y <= 7)
-							// createTileBody(world, x, y);
-							// }
-
-							lineSegments.clear();
-
-							switch (caveCell.getCellType()) {
-							case EMPTY:
-								mapTile = null;
-								break;
-							case WALL:
-								if (caveCell.getWallType() == WallType.LEFT) {
-									flipX = true;
-									flipY = rnd.nextBoolean();
-									tmpRegion = GameResources.verticalTiles
-											.random();
-								} else if (caveCell.getWallType() == WallType.LONELY_LEFT) {
-									flipX = false;
-									flipY = rnd.nextBoolean();
-									tmpRegion = GameResources.lonelyVerticalTiles
-											.random();
-								} else if (caveCell.getWallType() == WallType.RIGHT) {
-									flipX = false;
-									flipY = rnd.nextBoolean();
-									tmpRegion = GameResources.verticalTiles
-											.random();
-								} else if (caveCell.getWallType() == WallType.LONELY_RIGHT) {
-									flipX = true;
-									flipY = rnd.nextBoolean();
-									tmpRegion = GameResources.lonelyVerticalTiles
-											.random();
-								} else if (caveCell.getWallType() == WallType.CEILING) {
-									flipX = rnd.nextBoolean();
-									flipY = false;
-									tmpRegion = GameResources.horizontalTiles
-											.random();
-								} else if (caveCell.getWallType() == WallType.LONELY_TOP) {
-									flipX = rnd.nextBoolean();
-									flipY = true;
-									tmpRegion = GameResources.lonelyHorizontalTiles
-											.random();
-								} else if (caveCell.getWallType() == WallType.GROUND) {
-									flipX = rnd.nextBoolean();
-									flipY = true;
-									tmpRegion = GameResources.horizontalTiles
-											.random();
-								} else if (caveCell.getWallType() == WallType.LONELY_BOTTOM) {
-									flipX = rnd.nextBoolean();
-									flipY = false;
-									tmpRegion = GameResources.lonelyHorizontalTiles
-											.random();
-								} else if (caveCell.getWallType() == WallType.LEFT_RIGHT) {
-									flipX = false;
-									flipY = rnd.nextBoolean();
-									tmpRegion = GameResources.thinVerticalTiles
-											.random();
-								} else if (caveCell.getWallType() == WallType.GROUND_CEILING) {
-									flipX = rnd.nextBoolean();
-									flipY = false;
-									tmpRegion = GameResources.thinHorizontalTiles
-											.random();
-								} else {
-									tmpRegion = GameResources.wallRegion;
-								}
-
-								mapTile = new MyTiledMapTile(tmpRegion);
-
-								cell = new Cell();
-								cell.setFlipHorizontally(flipX);
-								cell.setFlipVertically(flipY);
-								cell.setTile(mapTile);
-								layer.setCell(x, y, cell);
-
-								// create box2d body for the wall
-								if (tmpRegion.name != GameResources.wallRegion.name) {
-									textureName = tmpRegion.name + "_"
-											+ tmpRegion.index + ".png";
-									createTileBody(world,
-											shapeDataMap.get(textureName), x,
-											y, flipX, flipY);
-								}
-								break;
-							case CORNER_WALL:
-								tmpRegion = GameResources.cornerTiles.random();
-
-								if (caveCell.getWallType() == WallType.UPPER_LEFT_CONVEX) {
-									flipX = false;
-									flipY = false;
-								} else if (caveCell.getWallType() == WallType.UPPER_RIGHT_CONVEX) {
-									flipX = true;
-									flipY = false;
-								} else if (caveCell.getWallType() == WallType.LOWER_RIGHT_CONVEX) {
-									flipX = true;
-									flipY = true;
-								} else if (caveCell.getWallType() == WallType.LOWER_LEFT_CONVEX) {
-									flipX = false;
-									flipY = true;
-								}
-
-								// create box2d body for the corner wall
-								textureName = tmpRegion.name + "_"
-										+ tmpRegion.index + ".png";
-								createTileBody(world,
-										shapeDataMap.get(textureName), x, y,
-										flipX, flipY);
-
-								mapTile = new MyTiledMapTile(tmpRegion);
-
-								cell = new Cell();
-								cell.setFlipHorizontally(flipX);
-								cell.setFlipVertically(flipY);
-								cell.setTile(mapTile);
-								layer.setCell(x, y, cell);
-								break;
-							}
-						}
-					}
-					layers.add(layer);
-
-					float unitScale = 1f / (float) GameConstants.TILE_SIZE;
-					mapRenderer = new OrthogonalTiledMapRenderer(map, unitScale);
-					mapRenderer.getSpriteBatch().setColor(tileColor);
-
-					mapCreationDone = true;
-					// tmpLineSegment.dispose();
-				}
+				float unitScale = 1f / (float) GameConstants.TILE_SIZE;
+				mapRenderer = new OrthogonalTiledMapRenderer(map, unitScale);
+				mapRenderer.getSpriteBatch().enableBlending();
+				mapCreationDone = true;
 			}
 		} else {
 			System.out.println("The cave generation is not ready!");
 		}
+	}
+
+	private Cell createCellforTiledMap(AtlasRegion texture, boolean flipX,
+			boolean flipY, String type) {
+		MyTiledMapTile mapTile = new MyTiledMapTile(texture);
+		mapTile.getProperties().put("type", type);
+		Cell cell = new Cell();
+		cell.setFlipHorizontally(flipX);
+		cell.setFlipVertically(flipY);
+		cell.setTile(mapTile);
+
+		return cell;
+	}
+
+	public Object getTileProperty(int x, int y, String prop, int layerIndex) {
+		TiledMapTileLayer layer = (TiledMapTileLayer) this.layers
+				.get(layerIndex);
+		if (layer.getCell(x, y) != null
+				&& layer.getCell(x, y).getTile() != null) {
+			TiledMapTile tile = layer.getCell(x, y).getTile();
+			MapProperties props = tile.getProperties();
+			if (props != null) {
+				if (props.containsKey(prop)) {
+					return props.get(prop);
+				} else {
+					System.out.println("Tile [" + x + "," + y
+							+ "] has no property named '" + prop + "'.");
+				}
+			}
+		}
+		return null;
 	}
 
 	public void createTileBody(World world, TileShapeData tileShapeData, int x,
@@ -347,7 +415,7 @@ public class MapManager extends InputAdapter {
 
 			EdgeShape tmpLineSegment = new EdgeShape();
 			tmpLineSegment.set(v1, v2);
-			body.createFixture(tmpLineSegment, 100f);
+			body.createFixture(tmpLineSegment, 20f);
 			tmpLineSegment.dispose();
 		}
 		body.setAwake(false);
@@ -357,6 +425,39 @@ public class MapManager extends InputAdapter {
 		if (mapCreationDone) {
 			mapRenderer.setView(cam);
 			mapRenderer.render();
+		}
+	}
+
+	public void renderBackgroundlayers(OrthographicCamera cam) {
+		if (mapCreationDone) {
+			mapRenderer.setView(cam);
+			
+			//render rock background
+			mapRenderer.getSpriteBatch().setColor(1, 1, 1, 1);
+//			mapRenderer.getSpriteBatch().enableBlending();
+			mapRenderer.render(rockLayerIndex);
+			
+			//render water background...
+			mapRenderer.getSpriteBatch().setColor(1, 1, 1, 0.7f);
+			mapRenderer.render(waterLayerIndex);
+			
+			mapRenderer.getSpriteBatch().setColor(1, 1, 1, 1);
+//			mapRenderer.getSpriteBatch().enableBlending();
+			mapRenderer.render(wallLayerIndex);
+		}
+	}
+
+	public void renderForegroundlayers(OrthographicCamera cam) {
+		if (mapCreationDone) {
+			mapRenderer.setView(cam);
+			
+			//render water foreground...		
+			mapRenderer.getSpriteBatch().setColor(1, 1, 1, 0.4f);
+			mapRenderer.render(waterLayerIndex);
+			
+			mapRenderer.getSpriteBatch().setColor(1, 1, 1, 1);
+			mapRenderer.render(wallLayerIndex);
+//			mapRenderer.render(foregroundLayers);
 		}
 	}
 

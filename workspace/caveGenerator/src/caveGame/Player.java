@@ -18,6 +18,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.MassData;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import common.GameConstants;
@@ -48,7 +49,7 @@ public class Player extends InputAdapter {
 	// DEBUG STUFF
 	public static ArrayList<String> debugStrings = new ArrayList<String>();
 
-	private static float SCALE = 4; // needed to make the "pixels" to scale
+	private static float SCALE = 1; // needed to make the "pixels" to scale
 
 	public Player(World world, Vector2 startPos) {
 		angle = 0;
@@ -63,9 +64,6 @@ public class Player extends InputAdapter {
 
 		bodyDef = new BodyDef();
 		bodyDef.type = BodyType.DynamicBody;
-		// bodyDef.position.set(new Vector2((Gdx.graphics.getWidth() / 2)
-		// / GameConstants.TILE_SIZE, (Gdx.graphics.getHeight() / 2)
-		// / GameConstants.TILE_SIZE));
 		bodyDef.position.set(startPos);
 		body = world.createBody(bodyDef);
 
@@ -89,7 +87,7 @@ public class Player extends InputAdapter {
 		shape.setAsBox(((w / 2) / GameConstants.TILE_SIZE) * SCALE,
 				((h / 2) / GameConstants.TILE_SIZE) * SCALE);
 
-		fixture = body.createFixture(shape, 50f);
+		fixture = body.createFixture(shape, 50);
 		shape.dispose();
 
 		animatedBox2dSprite.setPosition(
@@ -99,7 +97,8 @@ public class Player extends InputAdapter {
 		body.setFixedRotation(true);
 
 		animatedBox2dSprite.play();
-
+		
+		System.out.println(body.getMass());
 		body.setUserData(animatedBox2dSprite);
 	}
 
@@ -143,6 +142,10 @@ public class Player extends InputAdapter {
 		else if (body.getAngle() != angleRad)
 			body.setTransform(body.getPosition(), angleRad);
 
+	}
+	
+	public void setGravityScale(float gravity) {
+		body.setGravityScale(gravity);
 	}
 
 	public void setPosition(float x, float y) {
@@ -189,9 +192,8 @@ public class Player extends InputAdapter {
 	}
 
 	public void draw(SpriteBatch batch) {
+		batch.enableBlending();
 		animatedBox2dSprite.draw(batch, body);
-		// box2dSprite.draw(batch, body);
-		// animatedBox2dSprite.draw(batch, fixture);
 	}
 
 	public AnimatedBox2DSprite getSprite() {

@@ -12,6 +12,7 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
@@ -61,7 +62,7 @@ public class CaveGame implements ApplicationListener {
 	@Override
 	public void create() {
 		GameResources.init();
-		
+
 		PhysicsDataJsonParser.parse("data/physicsData.json");
 
 		// Gdx.graphics.setDisplayMode(Gdx.graphics.getDesktopDisplayMode().width,
@@ -79,6 +80,7 @@ public class CaveGame implements ApplicationListener {
 		camPos = new Vector2(mapWidth / 2, mapHeight / 2);
 
 		batch = new SpriteBatch();
+//		batch.enableBlending();
 
 		camera = new OrthographicCamera();
 		camera.setToOrtho(true, w / GameConstants.TILE_SIZE, h
@@ -91,9 +93,9 @@ public class CaveGame implements ApplicationListener {
 				/ (GameConstants.TILE_SIZE * 2));
 		maxCamPos = new Vector2(mapWidth - minCamPos.x, mapWidth - minCamPos.y);
 
-		 player = new Player(physics.getWorld(), new Vector2(mapWidth / 2 +
-		 .5f, .5f));
-//		player = new Player(physics.getWorld(), new Vector2(2, 2));
+		player = new Player(physics.getWorld(), new Vector2(mapWidth / 2 + .5f,
+				.5f));
+		// player = new Player(physics.getWorld(), new Vector2(2, 2));
 
 		hud = new HUD(w, h);
 
@@ -103,6 +105,8 @@ public class CaveGame implements ApplicationListener {
 		RayHandler.useDiffuseLight(true);
 		rayHandler = new RayHandler(physics.getWorld());
 		rayHandler.setCombinedMatrix(camera.combined);
+		// rayHandler.getLightMapTexture().setFilter(TextureFilter.Nearest,
+		// TextureFilter.Nearest);
 
 		playerlight = new PointLight(rayHandler, 11, new Color(1, 1, 1, 0.2f),
 				11.5f, player.getBody().getPosition().x, player.getBody()
@@ -118,7 +122,8 @@ public class CaveGame implements ApplicationListener {
 				.getWidth() / 2) / (GameConstants.TILE_SIZE / 2), -((player
 				.getSprite().getHeight() / 2) / (GameConstants.TILE_SIZE / 2)));
 
-		backgoundColor = new Color(0, 0.25f, 0.45f, 1.0f);
+		backgoundColor = Color.GRAY;
+		// backgoundColor = new Color(1, 1f, 1f, 1.0f);
 
 		inputMultiplexer = new InputMultiplexer();
 		inputMultiplexer.addProcessor(hud.getStage());
@@ -157,18 +162,28 @@ public class CaveGame implements ApplicationListener {
 		if (GameResources.isReady()) {
 			if (hud.getTouchpad().isTouched()) {
 				player.move(hud.getTouchpad().getKnobPercentX() / 18, hud
-						.getTouchpad().getKnobPercentY() / 18);				
+						.getTouchpad().getKnobPercentY() / 18);
 			}
 
 			// mapManager.update(player.getPos());
 			player.update(0, Vector2.Zero);
 
+			if ((String) mapManager.getTileProperty((int) player.getPos().x,
+					(int) player.getPos().y, "type", GameConstants.BACKGROUND_LAYER_2_INDEX) == "water") {
+//				System.out.println("WATER!!!!");
+				player.setGravityScale(0);
+			} else {
+				player.setGravityScale(1f / player.getBody().getMass());
+			}
+
 			setCameraPos(player.getPos().x, player.getPos().y);
-			mapManager.render(camera);
+			mapManager.renderBackgroundlayers(camera);
 
 			batch.begin();
 			player.draw(batch);
 			batch.end();
+			
+			mapManager.renderForegroundlayers(camera);
 
 			if (Globals.lightsEnabled) {
 				flashlight.setActive(player.isFlashlightEnabled());

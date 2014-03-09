@@ -21,18 +21,19 @@ public class PhysicsManager {
 	private Array<Body> deletionList = new Array<Body>();
 
 	public PhysicsManager() {
-		world = new World(new Vector2(0, 0), true);
+		//TODO: Fix box2d scale!!!
+		world = new World(new Vector2(0, 100f), true);
 		debugRenderer = new ExtendedBox2DDebugRenderer();
 		
-		BodyDef def = new BodyDef();
-		PolygonShape shape = new PolygonShape();
-		def.type = BodyType.DynamicBody;
-		def.position.set(5, 2);
-		def.linearDamping = 2;
-		def.angularDamping = 1;
-		shape.setAsBox(0.25f, 0.25f);
-		world.createBody(def).createFixture(shape, 50f);
-		shape.dispose();
+//		BodyDef def = new BodyDef();
+//		PolygonShape shape = new PolygonShape();
+//		def.type = BodyType.DynamicBody;
+//		def.position.set(5, 2);
+//		def.linearDamping = 2;
+//		def.angularDamping = 1;
+//		shape.setAsBox(0.25f, 0.25f);
+//		world.createBody(def).createFixture(shape, 50f);
+//		shape.dispose();
 	}
 
 	public void update(float timeStep, OrthographicCamera cam) {

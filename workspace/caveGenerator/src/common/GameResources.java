@@ -17,7 +17,8 @@ public class GameResources {
 	private static AssetManager assetManager;
 
 	// tilemap regions
-	public static Texture texture;
+	public static AtlasRegion waterTexture;
+	public static AtlasRegion waterSurfaceTexture;
 	public static Texture testPlayer;
 	public static Texture onePixelTexture;
 	public static Array<AtlasRegion> cornerTiles = new Array<AtlasRegion>();
@@ -27,6 +28,7 @@ public class GameResources {
 	public static Array<AtlasRegion> lonelyVerticalTiles = new Array<AtlasRegion>();
 	public static Array<AtlasRegion> thinHorizontalTiles = new Array<AtlasRegion>();
 	public static Array<AtlasRegion> thinVerticalTiles = new Array<AtlasRegion>();
+	public static Array<AtlasRegion> rockTiles = new Array<AtlasRegion>();
 	public static AtlasRegion wallRegion;
 
 	// parsed vertices for creation of box2d shapes for the tiles
@@ -47,8 +49,8 @@ public class GameResources {
 	private static void loadResources() {
 
 		// queue stuff for loading
-		assetManager.load("textures/tiles128.txt", TextureAtlas.class);
-		assetManager.load("textures/spritesheet.txt", TextureAtlas.class);
+		assetManager.load("textures/terrain/tiles128.txt", TextureAtlas.class);
+		assetManager.load("textures/diver/test/diver.txt", TextureAtlas.class);
 
 		assetManager.load("data/whitesquare.png", Texture.class);
 
@@ -63,12 +65,11 @@ public class GameResources {
 	private static void getResources() {
 		// load the vertex data for the tiles
 		shapeDataMap = PhysicsDataJsonParser.parse("data/physicsData.json");
-		
-		texture = assetManager.get("data/whitesquare.png");
+				
 		testPlayer = assetManager.get("textures/diver/test/diver_1.png");
 		onePixelTexture = assetManager.get("hud/onePixel.png");
-		tilesAtlas = assetManager.get("textures/tiles128.txt");
-		spriteAtlas = assetManager.get("textures/spritesheet.txt");
+		tilesAtlas = assetManager.get("textures/terrain/tiles128.txt");
+		spriteAtlas = assetManager.get("textures/diver/test/diver.txt");
 
 		// tilemap textures
 		cornerTiles = tilesAtlas.findRegions("corner");
@@ -78,8 +79,11 @@ public class GameResources {
 		lonelyVerticalTiles = tilesAtlas.findRegions("lonelyVerticalTile");
 		thinVerticalTiles = tilesAtlas.findRegions("thinVerticalTile");
 		thinHorizontalTiles = tilesAtlas.findRegions("thinHorizontalTile");
+		rockTiles = tilesAtlas.findRegions("rocks");
 		wallRegion = tilesAtlas.findRegion("empty");
-
+		waterTexture =  tilesAtlas.findRegion("water");
+		waterSurfaceTexture =  tilesAtlas.findRegion("waterSurface");
+		
 		// player sprites
 		diverSprites = spriteAtlas.findRegions("diver");
 	}
