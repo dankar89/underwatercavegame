@@ -1,0 +1,11 @@
+player64.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+player
+  rotate: false
+  xy: 2, 2
+  size: 10, 32
+  orig: 10, 32
+  offset: 0, 0
+  index: 1

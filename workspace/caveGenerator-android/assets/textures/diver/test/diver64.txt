@@ -1,0 +1,60 @@
+diver64.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+diver2
+  rotate: false
+  xy: 1, 120
+  size: 40, 16
+  orig: 40, 16
+  offset: 0, 0
+  index: 1
+diver2
+  rotate: false
+  xy: 1, 103
+  size: 40, 16
+  orig: 40, 16
+  offset: 0, 0
+  index: 2
+diver2
+  rotate: false
+  xy: 1, 86
+  size: 40, 16
+  orig: 40, 16
+  offset: 0, 0
+  index: 3
+diver2
+  rotate: false
+  xy: 1, 69
+  size: 40, 16
+  orig: 40, 16
+  offset: 0, 0
+  index: 4
+diver
+  rotate: false
+  xy: 1, 52
+  size: 40, 16
+  orig: 40, 16
+  offset: 0, 0
+  index: 1
+diver
+  rotate: false
+  xy: 1, 35
+  size: 40, 16
+  orig: 40, 16
+  offset: 0, 0
+  index: 2
+diver
+  rotate: false
+  xy: 1, 18
+  size: 40, 16
+  orig: 40, 16
+  offset: 0, 0
+  index: 3
+diver
+  rotate: false
+  xy: 1, 1
+  size: 40, 16
+  orig: 40, 16
+  offset: 0, 0
+  index: 4

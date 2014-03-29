@@ -11,7 +11,6 @@ import com.badlogic.gdx.utils.Json.Serializable;
 import com.badlogic.gdx.utils.JsonValue;
 import com.me.cavegenerator.Cell.CellType;
 import com.me.cavegenerator.Cell.WallType;
-import com.me.cavegenerator.OLD_Cell.CornerType;
 
 public class CaveMap implements Serializable {
 	public enum MapCellType {
@@ -30,6 +29,23 @@ public class CaveMap implements Serializable {
 	private ArrayList<Miner> miners = new ArrayList<Miner>();
 	private Miner startMiner;
 
+	private int[][] startArea = { 
+			{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+			{ 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1 }, 
+			{ 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1 },
+			{ 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1 },
+			{ 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1 }, 
+			{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+			};
+	private int startAreaWidth;
+	private int startAreaHeight;
+	private int mapHalfWidth;
+	private int startAreaHalfWidth;
+	private int startX;
+	private int endX;
+	private int startY;
+	private int endY;
+
 	public int getWidth() {
 		return mapWidth;
 	}
@@ -38,16 +54,71 @@ public class CaveMap implements Serializable {
 		return mapHeight;
 	}
 
+	public Vector2 getMinerStartPos() {
+		int[] array = startArea[startAreaHeight - 1];
+		for (int i = 0; i < array.length; i++) {
+			if (array[i] == 0)
+				return new Vector2(startX + i, endY-1);
+		}
+
+		return new Vector2(mapWidth / 2, 1);
+	}
+
 	public CaveMap(int width, int height, int smoothness) {
 		this.isReady = false;
 		this.mapWidth = width;
 		this.mapHeight = height;
 
+		startAreaWidth = startArea[0].length;
+		startAreaHeight = startArea.length;
+		mapHalfWidth = mapWidth / 2;
+		startAreaHalfWidth = startAreaWidth / 2;
+		startX = (mapHalfWidth - startAreaHalfWidth) -1;
+		endX = mapHalfWidth + (startAreaHalfWidth - 1);
+		startY = 0;
+		endY = startAreaHeight - 1;
+
 		// init a map with only wall tiles
 		mapArray = new Cell[width][height];
+
+		// createStartArea();
+
+		CellType cellType = null;
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < height; j++) {
-				mapArray[i][j] = new Cell(CellType.WALL, i, j);
+				if (mapArray[i][j] == null) {
+					// if(i == 0 || i == mapWidth-1 || j == 0 || j ==
+					// mapHeight-1){
+					// cellType = CellType.LOCKED_WALL;
+					// } else {
+					// cellType = CellType.WALL;
+					// }
+					cellType = CellType.WALL;
+					mapArray[i][j] = new Cell(cellType, i, j);
+				}
+			}
+		}
+	}
+
+	private void createStartArea() {
+
+		// CellType cellType = null;
+		Cell cell = null;
+		int startAreaX = 0, startAreaY = 0;
+
+		if ((startX >= 0 && endX < mapWidth) && startY >= 0 && endY < mapHeight) {
+			for (int x = startX; x <= endX; x++) {
+				for (int y = startY; y <= endY; y++) {
+					if (startArea[startAreaY][startAreaX] == 1) {
+						cell = new Cell(CellType.WALL, x, y);
+					} else {
+						cell = new Cell(CellType.EMPTY, x, y);
+					}
+					mapArray[x][y] = cell;
+					startAreaY++;
+				}
+				startAreaY = 0;
+				startAreaX++;
 			}
 		}
 	}
@@ -275,12 +346,13 @@ public class CaveMap implements Serializable {
 		if (!emptyCellLeft && !emptyCellRight && emptyCellAbove
 				&& emptyCellBelow)
 			wallType = wallType.GROUND_CEILING;
-		
+
 		if (emptyCellLeft && emptyCellRight && emptyCellAbove && emptyCellBelow)
 			wallType = wallType.NONE;
-		else if(!emptyCellLeft && !emptyCellRight && !emptyCellAbove && !emptyCellBelow)
+		else if (!emptyCellLeft && !emptyCellRight && !emptyCellAbove
+				&& !emptyCellBelow)
 			wallType = wallType.SOLID;
-		
+
 		cell.setWallType(wallType);
 		return cell;
 	}
@@ -290,6 +362,7 @@ public class CaveMap implements Serializable {
 		// ArrayList<Cell> corners = new ArrayList<Cell>();
 
 		Cell currentCell = null;
+
 		for (int i = 0; i < smoothness; i++) {
 			for (int x = 0; x < mapWidth; x++) {
 				for (int y = 0; y < mapHeight; y++) {
@@ -305,14 +378,9 @@ public class CaveMap implements Serializable {
 						// getCellAt(x, y).setCellType(CellType.WALL);
 						// }
 
-						// FIXME: Still get single, lonely tiles! Why the f**k
-						// is that?!
-
-						// FIXME: this code also removes the corners of the map
-						// since they only have 3 adjacent cells...
 						adjacentWalls = get8AdjacentCellsOfType(
 								currentCell.getPos(), CellType.WALL);
-						if (adjacentWalls.size() <= 3
+						if (adjacentWalls.size() <= 2 /* 3 */
 								|| adjacentWalls.isEmpty()) {
 							if ((currentCell.getX() > 0 && currentCell.getX() < mapWidth)
 									&& (currentCell.getY() > 0 && currentCell
@@ -320,13 +388,17 @@ public class CaveMap implements Serializable {
 								getCellAt(x, y).setCellType(CellType.EMPTY);
 							}
 
-						} else if (adjacentWalls.size() >= 5) {
+						} else if (adjacentWalls.size() >= 3 /* 5 */) {
 							getCellAt(x, y).setCellType(CellType.WALL);
 						}
 					}
 				}
 			}
 		}
+
+		// this needs to be done after cleanup above and before we set the
+		// walltypes
+		createStartArea();
 
 		// find and set corners
 		// TODO: this loop can probably be removed....
@@ -489,7 +561,7 @@ public class CaveMap implements Serializable {
 		int above = y - 1;
 		int below = y + 1;
 
-		if (right < mapWidth) {
+		if (right < mapWidth - 1) {
 			if (getCellAt(right, y).getCellType() == type)
 				adjacentCells.add(getCellAt(right, y));
 		}
@@ -501,7 +573,7 @@ public class CaveMap implements Serializable {
 			if (getCellAt(x, above).getCellType() == type)
 				adjacentCells.add(getCellAt(x, above));
 		}
-		if (below < mapHeight) {
+		if (below < mapHeight - 1) {
 			if (getCellAt(x, below).getCellType() == type)
 				adjacentCells.add(getCellAt(x, below));
 		}
@@ -520,23 +592,62 @@ public class CaveMap implements Serializable {
 		int above = y - 1;
 		int below = y + 1;
 
-		if (right < mapWidth) {
+		//FIXME: Why do I need -3 here? 
+		if (right < mapWidth - 3) {
 			if (getCellAt(right, y).getCellType() == type)
 				adjacentCells.add(getCellAt(right, y));
 		}
-		if (left > 0) {
+		if (left > 1) {
 			if (getCellAt(left, y).getCellType() == type)
 				adjacentCells.add(getCellAt(left, y));
 		}
-		if (above > 0) {
+		if (above > 1) {
 			if (getCellAt(x, above).getCellType() == type)
 				adjacentCells.add(getCellAt(x, above));
 		}
-		if (below < mapHeight) {
+		if (below < mapHeight - 3) {
 			if (getCellAt(x, below).getCellType() == type)
 				adjacentCells.add(getCellAt(x, below));
 		}
 
+		return adjacentCells;
+	}
+
+	public ArrayList<Cell> getAdjacentCellsOfTypeInDirection(Vector2 cellPos,
+			CellType type, Vector2 dir) {
+		ArrayList<Cell> adjacentCells = new ArrayList<Cell>();
+
+		int x = (int) cellPos.x;
+		int y = (int) cellPos.y;
+
+		int right = (x + 1);
+		int left = x - 1;
+		int above = y - 1;
+		int below = y + 1;
+
+		if (dir.x == 1) {
+			if (right < mapWidth - 1) {
+				if (getCellAt(right, y).getCellType() == type)
+					adjacentCells.add(getCellAt(right, y));
+			}
+		} else if (dir.x == -1) {
+			if (left > 0) {
+				if (getCellAt(left, y).getCellType() == type)
+					adjacentCells.add(getCellAt(left, y));
+			}
+		}
+
+		if (dir.y == 1) {
+			if (below < mapHeight - 1) {
+				if (getCellAt(x, below).getCellType() == type)
+					adjacentCells.add(getCellAt(x, below));
+			}
+		} else if (dir.y == -1) {
+			if (above > 0) {
+				if (getCellAt(x, above).getCellType() == type)
+					adjacentCells.add(getCellAt(x, above));
+			}
+		}
 		return adjacentCells;
 	}
 
@@ -549,7 +660,6 @@ public class CaveMap implements Serializable {
 		for (int dx = (x > 0 ? -1 : 0); dx <= (x < mapWidth - 1 ? 1 : 0); ++dx) {
 			for (int dy = (y > 0 ? -1 : 0); dy <= (y < mapHeight - 1 ? 1 : 0); ++dy) {
 				if (dx != 0 || dy != 0) {
-					// if (getCellAt(x + dx, y + dy).getType() == CellType.WALL)
 					adjacentCells.add(mapArray[x + dx][y + dy]);
 				}
 			}
@@ -588,16 +698,43 @@ public class CaveMap implements Serializable {
 		int above = y - 1;
 		int below = y + 1;
 
-		if (above > 0) {
+		if (above > 1) {
 			adjacentCells.add(getCellAt(x, above));
 		}
-		if (right < mapWidth) {
+		if (right < mapWidth - 2) {
 			adjacentCells.add(getCellAt(right, y));
 		}
-		if (below < mapHeight) {
+		if (below < mapHeight - 2) {
 			adjacentCells.add(getCellAt(x, below));
 		}
-		if (left > 0) {
+		if (left > 1) {
+			adjacentCells.add(getCellAt(left, y));
+		}
+
+		return adjacentCells;
+	}
+
+	public ArrayList<Cell> getAdjacentCells(Vector2 cellPos) {
+		ArrayList<Cell> adjacentCells = new ArrayList<Cell>();
+
+		int x = (int) cellPos.x;
+		int y = (int) cellPos.y;
+
+		int right = x + 1;
+		int left = x - 1;
+		int above = y - 1;
+		int below = y + 1;
+
+		if (above > 1) {
+			adjacentCells.add(getCellAt(x, above));
+		}
+		if (right < mapWidth - 2) {
+			adjacentCells.add(getCellAt(right, y));
+		}
+		if (below < mapHeight - 2) {
+			adjacentCells.add(getCellAt(x, below));
+		}
+		if (left > 1) {
 			adjacentCells.add(getCellAt(left, y));
 		}
 

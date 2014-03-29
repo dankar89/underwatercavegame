@@ -29,6 +29,8 @@ import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.Timer;
+import com.badlogic.gdx.utils.Timer.Task;
 import com.me.cavegenerator.Cell.CellType;
 import com.me.cavegenerator.Cell.WallType;
 import com.sun.org.apache.xml.internal.serialize.LineSeparator;
@@ -59,20 +61,22 @@ public class MapManager extends InputAdapter {
 	private Miner startMiner;
 	private Miner currentMiner;
 	private Iterator<Miner> minerIter;
-	private int digCounter;
+	private int digCounter, digFailure;
 	private int createdMiners = 1;
 	private int minersResetCounter;
+	private int minersAdded;
+	private int waterLevel = 10;
 
 	private int mapWidth, mapHeight;
 	private Vector2 minCamPos, maxCamPos;
 
 	private Vector2 playerStartPos;
 
-	private int[] rockLayerIndex = { GameConstants.BACKGROUND_LAYER_1_INDEX};
-//			GameConstants.BACKGROUND_LAYER_2_INDEX,
-//			GameConstants.BACKGROUND_LAYER_3_INDEX };
-	private int[] waterLayerIndex = {GameConstants.BACKGROUND_LAYER_2_INDEX};
-	private int[] wallLayerIndex = {GameConstants.BACKGROUND_LAYER_3_INDEX};
+	private int[] rockLayerIndex = { GameConstants.BACKGROUND_LAYER_1_INDEX };
+	// GameConstants.BACKGROUND_LAYER_2_INDEX,
+	// GameConstants.BACKGROUND_LAYER_3_INDEX };
+	private int[] waterLayerIndex = { GameConstants.BACKGROUND_LAYER_2_INDEX };
+	private int[] wallLayerIndex = { GameConstants.BACKGROUND_LAYER_3_INDEX };
 	private int[] foregroundLayers = { GameConstants.FOREGROUND_LAYER_1_INDEX };
 
 	private MapLayers layers;
@@ -94,6 +98,8 @@ public class MapManager extends InputAdapter {
 		mapCreationDone = false;
 
 		digCounter = 0;
+		digFailure = 0;
+		minersAdded = 0;
 		minersResetCounter = 0;
 
 		this.mapWidth = mapWidth;
@@ -102,67 +108,92 @@ public class MapManager extends InputAdapter {
 		int w = Gdx.graphics.getWidth();
 		int h = Gdx.graphics.getHeight();
 
-		playerStartPos = new Vector2(this.mapWidth / 2, 0);
+		// playerStartPos = new Vector2(this.mapWidth / 2, 1);
 
 		caveMap = new CaveMap(mapWidth, mapHeight, 0);
 
 		tileColor = new Color(0.20f, 0.10f, 0, 1.0f);
 
-		startMiner = new Miner(new Vector2(mapWidth / 2, 0));
+		startMiner = new Miner(caveMap.getMinerStartPos());
 		miners.add(startMiner);
 
 		this.map = new TiledMap();
-
-		// float unitScale = 1f / (float) Globals.TILE_SIZE;
-		// mapRenderer = new OrthogonalTiledMapRenderer(map, unitScale,
-		// mapBatch);
-
-		// tiledMapCamera = cam;
-		// tiledMapCamera = new OrthographicCamera();
-		// tiledMapCamera.setToOrtho(true, w / GameConstants.TILE_SIZE, h
-		// / GameConstants.TILE_SIZE);
-		// //
-		// tiledMapCamera.update();
 	}
 
 	public void generateMap(World world) {
 		// TODO: prevent the minerslist from being be emptied infinitely
 		minerIter = miners.iterator();
-		while (createdMiners < 350) {
+		while (createdMiners < /* 350 */150 && digCounter < 2500) {
 			while (minerIter.hasNext()) {
 				currentMiner = minerIter.next();
 
 				// If dig is successful, increment digCounter, else the dig
 				// fails, remove miner
 				caveMap = currentMiner.dig(caveMap, false, 0);
-				if (currentMiner.digSucccess)
+				if (currentMiner.digSucccess) {
 					digCounter++;
-				else
-					minerIter.remove();
-
+				} else {
+					if (miners.size() == 1) {
+						System.out.println("got here");
+						currentMiner.findWall(caveMap, 0, false);
+					} else {
+						minerIter.remove();
+					}
+				}
 				int rndInt = rnd.nextInt(100);
 
-				if (rndInt < 4) {
-					newMiners.add(new Miner(currentMiner.getCurrentPos()));
+				if (rndInt < 5) {
+					int xDelta = 0;
+					int yDelta = 0;
+					if ((currentMiner.getCurrentPos().x > 0 && currentMiner
+							.getCurrentPos().x < this.mapWidth - 1)
+							&& (currentMiner.getCurrentPos().y > 0 && currentMiner
+									.getCurrentPos().y < this.mapHeight - 1)) {
+						xDelta = rnd.nextBoolean() ? 1 : -1;
+						yDelta = rnd.nextBoolean() ? 1 : -1;
+					}
+					newMiners.add(new Miner(currentMiner.getCurrentPos().add(
+							xDelta, yDelta)));
 					createdMiners++;
+					System.out.println("createdMiners: " + createdMiners);
 				}
+				
+				System.out.println("digCounter " + digCounter);
+				System.out.println("digFail " + digFailure);
+				System.out.println("miners: " + miners.size());
 
-				if (miners.size() == 0) {
-					minersResetCounter++;
-					ArrayList<com.me.cavegenerator.Cell> adjacentCells = caveMap
-							.get8AdjacentCells(currentMiner.getCurrentPos());
-					Vector2 rndPos = adjacentCells.get(
-							rnd.nextInt(adjacentCells.size())).getPos();
-					newMiners.add(new Miner(rndPos));
-				}
+				// if (miners.size() == 0) {
+				// minersResetCounter++;
+				// ArrayList<com.me.cavegenerator.Cell> adjacentCells = caveMap
+				// .get8AdjacentCells(currentMiner.getCurrentPos());
+				// Vector2 rndPos = adjacentCells.get(
+				// rnd.nextInt(adjacentCells.size())).getPos();
+				// newMiners.add(new Miner(rndPos));
+				// }
 			}
 
 			miners.addAll(newMiners);
 			minerIter = miners.iterator();
 			newMiners.clear();
+			// try {
+			// Thread.sleep(250);
+			// } catch (InterruptedException e) {
+			// // TODO Auto-generated catch block
+			// e.printStackTrace();
+			// }
 		}
 
 		caveMap.cleanUp(5);
+		int maxWaterLevel = 30;
+		int minWaterLevel = 15;
+		waterLevel = rnd.nextInt((maxWaterLevel - minWaterLevel) + 1)
+				+ minWaterLevel;
+		
+		//remove this!
+//		waterLevel = 95;
+		
+		System.out.println("waterlevel " + waterLevel);
+
 		createTileMap(world);
 		mapGenerationDone = true;
 	}
@@ -221,9 +252,9 @@ public class MapManager extends InputAdapter {
 								createCellforTiledMap(tmpRegion, flipX, flipY,
 										type));
 					} else if (layerIndex == GameConstants.BACKGROUND_LAYER_2_INDEX) { // water
-						if (y > 4) {
+						if (y > waterLevel) {
 							type = "water";
-							if (y == 5) {
+							if (y == waterLevel + 1) {
 								tmpRegion = GameResources.waterSurfaceTexture;
 								flipX = rnd.nextBoolean();
 								flipY = true;
@@ -242,7 +273,8 @@ public class MapManager extends InputAdapter {
 				}
 
 				if (caveCell.getCellType() == CellType.WALL
-						|| caveCell.getCellType() == CellType.CORNER_WALL) {
+						|| caveCell.getCellType() == CellType.CORNER_WALL
+						) {
 					if (layerIndex == GameConstants.BACKGROUND_LAYER_3_INDEX
 							&& world != null) { // walls
 						lineSegments.clear();
@@ -277,7 +309,13 @@ public class MapManager extends InputAdapter {
 						} else if (caveCell.getWallType() == WallType.GROUND) {
 							flipX = rnd.nextBoolean();
 							flipY = true;
-							tmpRegion = GameResources.horizontalTiles.random();
+							if (y > waterLevel) {
+								tmpRegion = GameResources.horizontalTiles
+										.random();
+							} else {
+								tmpRegion = GameResources.horizontalTiles
+										.get(0);
+							}
 						} else if (caveCell.getWallType() == WallType.LONELY_BOTTOM) {
 							flipX = rnd.nextBoolean();
 							flipY = false;
@@ -387,6 +425,7 @@ public class MapManager extends InputAdapter {
 		return null;
 	}
 
+	// TODO: create one BIG body and just attach shapes to it
 	public void createTileBody(World world, TileShapeData tileShapeData, int x,
 			int y, boolean flipX, boolean flipY) {
 
@@ -431,18 +470,18 @@ public class MapManager extends InputAdapter {
 	public void renderBackgroundlayers(OrthographicCamera cam) {
 		if (mapCreationDone) {
 			mapRenderer.setView(cam);
-			
-			//render rock background
+
+			// render rock background
 			mapRenderer.getSpriteBatch().setColor(1, 1, 1, 1);
-//			mapRenderer.getSpriteBatch().enableBlending();
+			// mapRenderer.getSpriteBatch().enableBlending();
 			mapRenderer.render(rockLayerIndex);
-			
-			//render water background...
+
+			// render water background...
 			mapRenderer.getSpriteBatch().setColor(1, 1, 1, 0.7f);
 			mapRenderer.render(waterLayerIndex);
-			
+
 			mapRenderer.getSpriteBatch().setColor(1, 1, 1, 1);
-//			mapRenderer.getSpriteBatch().enableBlending();
+			// mapRenderer.getSpriteBatch().enableBlending();
 			mapRenderer.render(wallLayerIndex);
 		}
 	}
@@ -450,14 +489,14 @@ public class MapManager extends InputAdapter {
 	public void renderForegroundlayers(OrthographicCamera cam) {
 		if (mapCreationDone) {
 			mapRenderer.setView(cam);
-			
-			//render water foreground...		
+
+			// render water foreground...
 			mapRenderer.getSpriteBatch().setColor(1, 1, 1, 0.4f);
 			mapRenderer.render(waterLayerIndex);
-			
+
 			mapRenderer.getSpriteBatch().setColor(1, 1, 1, 1);
 			mapRenderer.render(wallLayerIndex);
-//			mapRenderer.render(foregroundLayers);
+			// mapRenderer.render(foregroundLayers);
 		}
 	}
 
@@ -524,9 +563,9 @@ public class MapManager extends InputAdapter {
 		return caveMap;
 	}
 
-	// public float getZoom() {
-	// return tiledMapCamera.zoom;
-	// }
+	public int getWaterLevel() {
+		return this.waterLevel;
+	}
 
 	public OrthogonalTiledMapRenderer getRenderer() {
 		return mapRenderer;

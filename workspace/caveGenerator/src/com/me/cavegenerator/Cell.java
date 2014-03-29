@@ -75,7 +75,7 @@ public class Cell {
 	}
 
 	public enum CellType {
-		EMPTY, WALL, CORNER_WALL
+		EMPTY, WALL, CORNER_WALL, LOCKED_WALL, LOCKED_EMPTY
 	}
 
 	// convex

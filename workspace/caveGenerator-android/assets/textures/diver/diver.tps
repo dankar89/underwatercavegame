@@ -4,7 +4,9 @@
         <key>fileFormatVersion</key>
         <int>3</int>
         <key>texturePackerVersion</key>
-        <string>3.2.1</string>
+        <string>3.3.1</string>
+        <key>fileName</key>
+        <string>C:/Users/Daniel/Documents/GitHub/underwatercavegame/workspace/caveGenerator-android/assets/textures/diver/diver.tps</string>
         <key>autoSDSettings</key>
         <array>
             <struct type="AutoSDSettings">
@@ -36,7 +38,7 @@
         <key>dataFormat</key>
         <string>libgdx</string>
         <key>textureFileName</key>
-        <filename>../spritesheet.png</filename>
+        <filename>test/diver64.png</filename>
         <key>flipPVR</key>
         <false/>
         <key>ditherType</key>
@@ -59,6 +61,8 @@
         <uint>80</uint>
         <key>pngOptimizationLevel</key>
         <uint>0</uint>
+        <key>webpQualityLevel</key>
+        <uint>101</uint>
         <key>textureSubPath</key>
         <string></string>
         <key>textureFormat</key>
@@ -127,7 +131,7 @@
             <key>data</key>
             <struct type="DataFile">
                 <key>name</key>
-                <filename>../spritesheet.txt</filename>
+                <filename>test/diver64.txt</filename>
             </struct>
         </map>
         <key>multiPack</key>
@@ -166,15 +170,14 @@
         </struct>
         <key>fileList</key>
         <array>
-            <filename>New folder/diver2_4.png</filename>
-            <filename>New folder/diver_1.png</filename>
-            <filename>New folder/diver_2.png</filename>
-            <filename>New folder/diver_3.png</filename>
-            <filename>New folder/diver_4.png</filename>
-            <filename>New folder/diver2_1.png</filename>
-            <filename>New folder/diver2_2.png</filename>
-            <filename>New folder/diver2_3.png</filename>
-            <filename>../environment/uglyshark_1.png</filename>
+            <filename>test/diver_1.png</filename>
+            <filename>test/diver_2.png</filename>
+            <filename>test/diver_3.png</filename>
+            <filename>test/diver_4.png</filename>
+            <filename>test/diver2_1.png</filename>
+            <filename>test/diver2_2.png</filename>
+            <filename>test/diver2_3.png</filename>
+            <filename>test/diver2_4.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>

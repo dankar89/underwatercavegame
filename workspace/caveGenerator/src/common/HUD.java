@@ -104,7 +104,7 @@ public class HUD {
 
 	}
 
-	public void drawMiniMap(CaveMap caveMap, Vector2 playerPos) {
+	public void drawMiniMap(CaveMap caveMap, Vector2 playerPos, int waterLevel) {
 		// minimapCamera.update();
 		// minimapBatch.setProjectionMatrix(minimapCamera.combined);
 
@@ -116,6 +116,8 @@ public class HUD {
 			for (int y = 0; y < caveMap.getHeight(); y++) {
 				if (caveMap.getCellAt(x, y).getCellType() == CellType.WALL) {
 					minimapBatch.setColor(Color.BLACK);
+				} else if(y >= waterLevel) {
+					minimapBatch.setColor(0, 166, 255, 255);
 				} else {
 					minimapBatch.setColor(Color.WHITE);
 				}

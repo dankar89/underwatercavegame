@@ -36,9 +36,11 @@ public class GameResources {
 
 	// player sprite regions
 	public static Array<AtlasRegion> diverSprites = new Array<AtlasRegion>();
+	public static Array<AtlasRegion> playerSprites = new Array<AtlasRegion>();
 
 	public static TextureAtlas tilesAtlas;
 	public static TextureAtlas spriteAtlas;
+	public static TextureAtlas playerSpriteAtlas;
 
 	public static void init() {
 		assetManager = new AssetManager();
@@ -50,13 +52,14 @@ public class GameResources {
 
 		// queue stuff for loading
 		assetManager.load("textures/terrain/tiles128.txt", TextureAtlas.class);
-		assetManager.load("textures/diver/test/diver.txt", TextureAtlas.class);
+		assetManager.load("textures/diver/test/diver64.txt", TextureAtlas.class);
+		assetManager.load("textures/player/player64.txt", TextureAtlas.class);
 
 		assetManager.load("data/whitesquare.png", Texture.class);
 
 		assetManager.load("hud/onePixel.png", Texture.class);
 
-		assetManager.load("textures/diver/test/diver_1.png", Texture.class);
+		assetManager.load("textures/player6.png", Texture.class);
 
 		// do the actual loading
 		assetManager.finishLoading();
@@ -66,10 +69,11 @@ public class GameResources {
 		// load the vertex data for the tiles
 		shapeDataMap = PhysicsDataJsonParser.parse("data/physicsData.json");
 				
-		testPlayer = assetManager.get("textures/diver/test/diver_1.png");
+//		testPlayer = assetManager.get("textures/player6.png");
 		onePixelTexture = assetManager.get("hud/onePixel.png");
 		tilesAtlas = assetManager.get("textures/terrain/tiles128.txt");
-		spriteAtlas = assetManager.get("textures/diver/test/diver.txt");
+		spriteAtlas = assetManager.get("textures/diver/test/diver64.txt");
+		playerSpriteAtlas = assetManager.get("textures/player/player64.txt");
 
 		// tilemap textures
 		cornerTiles = tilesAtlas.findRegions("corner");
@@ -85,7 +89,10 @@ public class GameResources {
 		waterSurfaceTexture =  tilesAtlas.findRegion("waterSurface");
 		
 		// player sprites
-		diverSprites = spriteAtlas.findRegions("diver");
+		
+		//TODO: Remove this test!!
+		playerSprites = playerSpriteAtlas.findRegions("player");
+		diverSprites = spriteAtlas.findRegions("diver");		
 	}
 
 	public static void dispose() {
