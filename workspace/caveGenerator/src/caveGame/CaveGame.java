@@ -12,6 +12,8 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Pixmap.Filter;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
@@ -37,7 +39,7 @@ public class CaveGame implements ApplicationListener {
 	private Player player;
 	private Vector2 playerStartPos;
 
-	private Vector2 minCamPos, maxCamPos, camPos;
+	private Vector2 minCamPos, maxCamPos, camPos, mouseWorldPos;
 
 	private int w, h;
 	private int mapWidth, mapHeight;
@@ -115,6 +117,14 @@ public class CaveGame implements ApplicationListener {
 		inputMultiplexer.addProcessor(mapManager);
 		inputMultiplexer.addProcessor(new GameInputProcessor());
 		Gdx.input.setInputProcessor(inputMultiplexer);
+		
+		Pixmap.setFilter(Filter.NearestNeighbour);
+//		Pixmap pixmap = new Pixmap(64, 64, Pixmap.Format.RGBA8888);
+		Pixmap pixmap = new Pixmap(Gdx.files.internal("textures/crosshair2.png"));
+//		pixmap.setColor(Color.YELLOW);
+//		pixmap.
+//		pixmap.drawCircle(pixmap.getWidth()/2, pixmap.getHeight()/2, 6);
+		Gdx.input.setCursorImage(pixmap, pixmap.getWidth()/2, pixmap.getHeight()/2);
 	}
 
 	@Override
@@ -146,13 +156,18 @@ public class CaveGame implements ApplicationListener {
 		// }
 
 		if (GameResources.isReady()) {
+			mouseWorldPos = new Vector2(
+					(camera.position.x - ((Gdx.graphics.getWidth() / 2) / (float)GameConstants.TILE_SIZE))
+							+ (Gdx.input.getX() / (float)GameConstants.TILE_SIZE),
+					(camera.position.y - ((Gdx.graphics.getHeight() / 2) / (float)GameConstants.TILE_SIZE))
+							+ (Gdx.input.getY() / (float)GameConstants.TILE_SIZE));
 //			 if (Gdx.input.isTouched()) {
 //				 System.out.println("miner start pos: " + this.mapManager.getCaveMap().getMinerStartPos());
 //				 System.out.println("player pos: "+  player.getPos());
 //			 }
 
 			// mapManager.update(player.getPos());
-			player.update(0, camera, mapManager.getWaterLevel());
+			player.update(0, mouseWorldPos, mapManager.getWaterLevel());
 			// if(Gdx.input.isKeyPressed(Keys.W)) {
 			// player.setGravityScale(0);
 			// }

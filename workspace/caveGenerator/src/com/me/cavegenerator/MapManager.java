@@ -135,7 +135,7 @@ public class MapManager extends InputAdapter {
 				} else {
 					if (miners.size() == 1) {
 						System.out.println("got here");
-						currentMiner.findWall(caveMap, 0, false);
+						currentMiner.findWall(caveMap, 0, true);
 					} else {
 						minerIter.remove();
 					}

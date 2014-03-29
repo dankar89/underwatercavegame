@@ -44,7 +44,12 @@ public class Player extends InputAdapter {
 	AnimatedSprite animatedSprite;
 	AnimatedBox2DSprite animatedBox2dSprite;
 	Box2DSprite box2dSprite;
-	private boolean isMoving;
+
+	private enum LookDirection {
+		LEFT, RIGHT, UP, DOWN,
+	}
+
+	private LookDirection lookDirection;
 
 	private Vector2 movement;
 	private float speed;
@@ -57,7 +62,7 @@ public class Player extends InputAdapter {
 
 	private PointLight playerlight;
 	private ConeLight flashlight;
-	private float flashlightAngle = 0;
+	private float lookAngle = 0;
 
 	// DEBUG STUFF
 	public static ArrayList<String> debugStrings = new ArrayList<String>();
@@ -68,7 +73,7 @@ public class Player extends InputAdapter {
 		angle = 0;
 		flashlightEnabled = false;
 		isUnderWater = false;
-		isMoving = false;
+		lookDirection = LookDirection.RIGHT;
 		speed = 5.5f;
 		rotationSpeed = 3f;
 		movement = Vector2.Zero;
@@ -98,7 +103,7 @@ public class Player extends InputAdapter {
 		animatedBox2dSprite.setOrigin(w / 2, h / 2);
 
 		FixtureDef fixDef = new FixtureDef();
-		fixDef.density = 6.5f;
+		fixDef.density = 10f;
 		fixDef.friction = 2f;
 
 		shape = new PolygonShape();
@@ -143,27 +148,32 @@ public class Player extends InputAdapter {
 		System.out.println(body.getMass());
 		body.setUserData(animatedBox2dSprite);
 
-		playerlight = new PointLight(rayHandler, 11, new Color(1, 1, 1, 0.2f),
+		playerlight = new PointLight(rayHandler, 15, new Color(1, 1, 1, 0.2f),
 				8.5f, body.getPosition().x, body.getPosition().y);
 		playerlight.attachToBody(body, 0, 0);
 
 		Vector2 lightPos = new Vector2(body.getPosition().x,
 				body.getPosition().y);
 		Color lightColor = new Color(0.2f, 0.5f, 0.5f, 0.55f);
-		flashlight = new ConeLight(rayHandler, 5, lightColor, 22.0f,
+		flashlight = new ConeLight(rayHandler, 11, lightColor, 22.0f,
 				lightPos.x, lightPos.y, 0, 20.0f);
 	}
 
-	public void update(float detla, OrthographicCamera cam, int waterLevel) {
+	public void update(float detla, Vector2 mouseWorldPos, int waterLevel) {
 		animatedBox2dSprite.update(1 / 60f);
-
-		if (Gdx.input.isKeyPressed(Keys.LEFT) || Gdx.input.isKeyPressed(Keys.A)) {
-			movement.x = -speed;
-		} else if (Gdx.input.isKeyPressed(Keys.RIGHT)
-				|| Gdx.input.isKeyPressed(Keys.D)) {
-			movement.x = speed;
-		} else
+		if (movingLeft() && movingRight()) {
 			movement.x = 0;
+		} else {
+			if (movingLeft()) {
+				lookDirection = LookDirection.LEFT;
+				movement.x = -speed;
+			} else if (movingRight()) {
+				lookDirection = LookDirection.RIGHT;
+				movement.x = speed;
+			} else {
+				movement.x = 0;
+			}
+		}
 
 		if (Gdx.input.isKeyPressed(Keys.UP) || Gdx.input.isKeyPressed(Keys.W)) {
 			movement.y = -speed;
@@ -180,47 +190,56 @@ public class Player extends InputAdapter {
 			flashlight.setActive(isFlashlightEnabled());
 
 		if (Gdx.input.isTouched()) {
-//			flashlightAngle = MathUtils.atan2(
-//					(Gdx.input.getY() / GameConstants.PIXELS_PER_METER)
-//							- getPos().y,
-//					(Gdx.input.getX() / GameConstants.PIXELS_PER_METER)
-//							- getPos().x);
-//			System.out.println(getScreenPos(cam));
-//			flashlightAngle = new Vector2(Gdx.input.getX(), Gdx.input.getY()).sub(getPos())
-			System.out.println(flashlightAngle);
-			System.out.println((flashlightAngle * MathUtils.radDeg) * 10);
-
+			// System.out.println("mouseWorldPos: " + mouseWorldPos);
+			// System.out.println((flashlightAngle * MathUtils.radDeg));
 		}
-		
-		flashlight.setDirection(flashlightAngle);
+
+		lookAngle = MathUtils.atan2(mouseWorldPos.y - getPos().y,
+				mouseWorldPos.x - getPos().x) * MathUtils.radDeg;
+		flashlight.setDirection(lookAngle);
 		flashlight.setPosition(getPos());
 
+		// if looking left, flip left
+		if (lookAngle < -90 && lookAngle > 90) {
+
+		}
+
 		if ((int) body.getPosition().y > waterLevel) {
+			body.setGravityScale(0);
 			if (Gdx.input.isKeyPressed(Keys.SPACE)) {
 				swim(0, -(speed * 2));
 			} else {
 				swim(movement.x * 2, movement.y * 2);
 			}
 
-			body.setGravityScale(0);
-			body.setLinearDamping(10f);
 			// body.setFixedRotation(false);
 			isUnderWater = true;
 		} else {
-			move(movement.x);
 			body.setGravityScale(1);
-			body.setLinearDamping(2f);
+			// body.setLinearDamping(2f);
+			move(movement.x);
 			isUnderWater = false;
 		}
 	}
 
+	private boolean movingLeft() {
+		return Gdx.input.isKeyPressed(Keys.LEFT)
+				|| Gdx.input.isKeyPressed(Keys.A);
+	}
+
+	private boolean movingRight() {
+		return Gdx.input.isKeyPressed(Keys.RIGHT)
+				|| Gdx.input.isKeyPressed(Keys.D);
+	}
+
 	public void jump() {
 		// body.applyForceToCenter(0, -15f, true);
-		body.applyLinearImpulse(0, -2.5f, body.getWorldCenter().x,
+		body.applyLinearImpulse(0, -3.5f, body.getWorldCenter().x,
 				body.getWorldCenter().y, true);
 	}
 
 	public void swim(float mx, float my) {
+		body.setLinearDamping(10f);
 		if (mx != 0 || my != 0)
 			body.applyForce(mx, my, body.getWorldCenter().x,
 					body.getWorldCenter().y, true);
@@ -236,13 +255,14 @@ public class Player extends InputAdapter {
 	}
 
 	public void move(float mx) {
-		isMoving = true;
-
 		if (mx != 0) {
-			body.applyForce(mx, 0, body.getWorldCenter().x,
+			body.setLinearDamping(1f);
+			body.applyForce(mx * 1.5f, 0, body.getWorldCenter().x,
 					body.getWorldCenter().y, true);
-			body.getFixtureList().get(0).setFriction(.5f);
+
+			// body.getFixtureList().get(0).setFriction(.5f);
 		} else {
+			// body.setLinearDamping(0f);
 			// body.getFixtureList().get(0).setFriction(2f);
 		}
 
@@ -252,22 +272,22 @@ public class Player extends InputAdapter {
 		body.setGravityScale(gravity);
 	}
 
-	public void setPosition(float x, float y) {
-		isMoving = true;
-
-		// pos.x += x;
-		// pos.y += y;
-
-		// float angleRad = (float) Math.atan2(y, x);
-		//
-		// if (body.getAngle() < angleRad)
-		// body.setAngularVelocity(rotationSpeed);
-		// else if (body.getAngle() < -angleRad)
-		// body.setAngularVelocity(-rotationSpeed);
-		// else if(body.getAngle() != angleRad)
-		// body.setTransform(body.getPosition(), angleRad);
-
-	}
+	// public void setPosition(float x, float y) {
+	// isMoving = true;
+	//
+	// // pos.x += x;
+	// // pos.y += y;
+	//
+	// // float angleRad = (float) Math.atan2(y, x);
+	// //
+	// // if (body.getAngle() < angleRad)
+	// // body.setAngularVelocity(rotationSpeed);
+	// // else if (body.getAngle() < -angleRad)
+	// // body.setAngularVelocity(-rotationSpeed);
+	// // else if(body.getAngle() != angleRad)
+	// // body.setTransform(body.getPosition(), angleRad);
+	//
+	// }
 
 	public void reset() {
 
@@ -285,10 +305,12 @@ public class Player extends InputAdapter {
 	}
 
 	public void stop() {
-		body.setLinearVelocity(0, 0);
+		// body.setLinearDamping(5f);
+		// System.out.println(body.getLinearDamping());
+		// body.setLinearVelocity(0, 0);
 		body.setAngularVelocity(0);
 		movement = Vector2.Zero;
-		isMoving = false;
+		// moveDirection = LookDirection.NONE;
 	}
 
 	public void scale(float amount) {
@@ -311,12 +333,19 @@ public class Player extends InputAdapter {
 	public Vector2 getPos() {
 		return body.getPosition();
 	}
-	
-//	public Vector2 getScreenPos(OrthographicCamera cam) {
-//		Vector3 topLeft = cam.position.sub(cam.viewportWidth/2, cam.viewportHeight/2, 0);	
-//		System.out.println("viewport: " + topLeft.toString());
-//		return getPos().scl(GameConstants.PIXELS_PER_METER).sub(topLeft.x, topLeft.y);
-//	}
+
+	// public Vector2 getScreenPos(OrthographicCamera cam) {
+	// // Vector2 topLeft = new Vector2(
+	// // (cam.position.x * GameConstants.TILE_SIZE)
+	// // - Gdx.graphics.getWidth(),
+	// // (cam.position.y * GameConstants.TILE_SIZE)
+	// // - Gdx.graphics.getHeight());
+	// //
+	//
+	// System.out.println("viewport: " + topLeft.toString());
+	// return getPos().scl(GameConstants.PIXELS_PER_METER).sub(topLeft.x,
+	// topLeft.y);
+	// }
 
 	public boolean isFlashlightEnabled() {
 		return flashlightEnabled;
@@ -333,14 +362,21 @@ public class Player extends InputAdapter {
 		switch (keycode) {
 		case Keys.LEFT:
 		case Keys.A:
-			if (!isMoving && !animatedBox2dSprite.isFlipX())
+			System.out.println(lookDirection);
+			System.out.println(animatedBox2dSprite.isFlipX());
+			if (lookDirection == LookDirection.LEFT && !animatedBox2dSprite.isFlipX()) {
+				System.out.println("moving left");
 				animatedBox2dSprite.flipFrames(true, false);
+			}
 			break;
 		case Keys.RIGHT:
 		case Keys.D:
-			// if (!animatedBox2dSprite.isFlipX())
-			if (!isMoving && animatedBox2dSprite.isFlipX())
+			System.out.println(lookDirection);
+			System.out.println(animatedBox2dSprite.isFlipX());
+			if (lookDirection == LookDirection.RIGHT && animatedBox2dSprite.isFlipX()) {
+				System.out.println("moving right");
 				animatedBox2dSprite.flipFrames(true, false);
+			}
 			break;
 		case Keys.R:
 			body.setAngularVelocity(5f);
@@ -361,14 +397,23 @@ public class Player extends InputAdapter {
 	public boolean keyUp(int keycode) {
 		switch (keycode) {
 		case Keys.LEFT:
+		case Keys.A:
+			stop();
+
+			// if(lookDirection == LookDirection.LEFT)
+			// lookDirection =
 			// body.getFixtureList().get(0).setFriction(1.5f);
 			// stop();
+			// if(isMoving)
 			// animatedBox2dSprite.flipFrames(true, false);
 			break;
 		case Keys.RIGHT:
+		case Keys.D:
+			stop();
 			// body.getFixtureList().get(0).setFriction(1.5f);
 			// stop();
 			// if (animatedBox2dSprite.isFlipX())
+			// if(isMoving)
 			// animatedBox2dSprite.flipFrames(true, false);
 			break;
 		case Keys.UP:
