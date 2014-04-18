@@ -29,6 +29,7 @@ public class GameResources {
 	public static Array<AtlasRegion> thinHorizontalTiles = new Array<AtlasRegion>();
 	public static Array<AtlasRegion> thinVerticalTiles = new Array<AtlasRegion>();
 	public static Array<AtlasRegion> rockTiles = new Array<AtlasRegion>();
+	public static Array<AtlasRegion> stuffInTheWater = new Array<AtlasRegion>();
 	public static AtlasRegion wallRegion;
 
 	// parsed vertices for creation of box2d shapes for the tiles
@@ -84,6 +85,7 @@ public class GameResources {
 		thinVerticalTiles = tilesAtlas.findRegions("thinVerticalTile");
 		thinHorizontalTiles = tilesAtlas.findRegions("thinHorizontalTile");
 		rockTiles = tilesAtlas.findRegions("rocks");
+		stuffInTheWater = tilesAtlas.findRegions("seaweed");
 		wallRegion = tilesAtlas.findRegion("empty");
 		waterTexture =  tilesAtlas.findRegion("water");
 		waterSurfaceTexture =  tilesAtlas.findRegion("waterSurface");

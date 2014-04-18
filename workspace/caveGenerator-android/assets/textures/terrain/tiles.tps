@@ -1014,6 +1014,8 @@
             <filename>rocks_2.png</filename>
             <filename>rocks_1.png</filename>
             <filename>rocks_2.png</filename>
+            <filename>entrance.png</filename>
+            <filename>shop.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>

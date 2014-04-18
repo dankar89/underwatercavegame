@@ -4,21 +4,21 @@ filter: Nearest,Nearest
 repeat: none
 corner
   rotate: false
-  xy: 267, 531
+  xy: 267, 795
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: 6
 horizontalTile
   rotate: false
-  xy: 663, 135
+  xy: 795, 135
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: 1
 lonelyVerticalTile
   rotate: false
-  xy: 795, 3
+  xy: 135, 135
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
@@ -32,28 +32,28 @@ verticalTile
   index: 1
 lonelyTile
   rotate: false
-  xy: 135, 267
+  xy: 135, 399
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: 3
 corner
   rotate: false
-  xy: 663, 267
+  xy: 399, 399
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: 1
 corner
   rotate: false
-  xy: 267, 663
+  xy: 399, 267
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: 5
 rocks
   rotate: false
-  xy: 663, 3
+  xy: 795, 3
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
@@ -67,21 +67,21 @@ waterSurfaceMedium
   index: 1
 seaweed
   rotate: false
-  xy: 399, 3
+  xy: 531, 3
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: 1
 horizontalTile
   rotate: false
-  xy: 267, 135
+  xy: 399, 135
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: 4
 lonelyVerticalTile
   rotate: false
-  xy: 135, 135
+  xy: 135, 267
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
@@ -93,37 +93,37 @@ waterSurfaceLow
   orig: 128, 128
   offset: 0, 0
   index: 1
-lonelyTile
-  rotate: false
-  xy: 135, 399
-  size: 128, 128
-  orig: 128, 128
-  offset: 0, 0
-  index: 2
 empty
   rotate: false
-  xy: 267, 267
+  xy: 267, 531
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
+lonelyTile
+  rotate: false
+  xy: 135, 531
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: 2
 corner
   rotate: false
-  xy: 267, 795
+  xy: 531, 267
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: 4
 rocks
   rotate: false
-  xy: 531, 3
+  xy: 663, 3
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: 2
 horizontalTile
   rotate: false
-  xy: 399, 135
+  xy: 531, 135
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
@@ -151,42 +151,56 @@ waterSurface
   index: 1
 horizontalTileOverlay
   rotate: false
-  xy: 795, 135
+  xy: 267, 267
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: 1
 lonelyTile
   rotate: false
-  xy: 135, 531
+  xy: 135, 663
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: 1
 lonelyCeiling
   rotate: false
-  xy: 135, 663
+  xy: 135, 795
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: 2
 corner
   rotate: false
-  xy: 399, 267
+  xy: 663, 267
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: 3
 corner
   rotate: false
-  xy: 267, 399
+  xy: 267, 663
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: 7
+shop
+  rotate: false
+  xy: 399, 3
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+entrance
+  rotate: false
+  xy: 267, 399
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
 horizontalTile
   rotate: false
-  xy: 531, 135
+  xy: 663, 135
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
@@ -207,7 +221,7 @@ verticalTile
   index: 2
 lonelyCeiling
   rotate: false
-  xy: 135, 795
+  xy: 267, 135
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
@@ -221,7 +235,7 @@ thinVerticalTile
   index: 1
 corner
   rotate: false
-  xy: 531, 267
+  xy: 795, 267
   size: 128, 128
   orig: 128, 128
   offset: 0, 0

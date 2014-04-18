@@ -148,14 +148,15 @@ public class Player extends InputAdapter {
 		System.out.println(body.getMass());
 		body.setUserData(animatedBox2dSprite);
 
-		playerlight = new PointLight(rayHandler, 15, new Color(1, 1, 1, 0.2f),
+		
+		playerlight = new PointLight(rayHandler, 100, new Color(1, 1, 1, 0.2f),
 				8.5f, body.getPosition().x, body.getPosition().y);
 		playerlight.attachToBody(body, 0, 0);
 
 		Vector2 lightPos = new Vector2(body.getPosition().x,
 				body.getPosition().y);
 		Color lightColor = new Color(0.2f, 0.5f, 0.5f, 0.55f);
-		flashlight = new ConeLight(rayHandler, 11, lightColor, 22.0f,
+		flashlight = new ConeLight(rayHandler, 100, lightColor, 15.0f,
 				lightPos.x, lightPos.y, 0, 20.0f);
 	}
 

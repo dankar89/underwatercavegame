@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Filter;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
@@ -85,9 +86,13 @@ public class CaveGame implements ApplicationListener {
 		
 		physics = new PhysicsManager();
 
-		RayHandler.setGammaCorrection(true);
+		RayHandler.setGammaCorrection(true);		
 		RayHandler.useDiffuseLight(true);
 		rayHandler = new RayHandler(physics.getWorld());
+		rayHandler.getLightMapTexture().setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
+		rayHandler.setBlur(false);
+		rayHandler.setCulling(true);
+		
 		rayHandler.setCombinedMatrix(camera.combined);
 		
 		camPos = new Vector2(mapWidth / 2, mapHeight / 2);

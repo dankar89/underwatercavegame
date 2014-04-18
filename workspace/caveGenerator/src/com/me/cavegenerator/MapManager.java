@@ -157,7 +157,7 @@ public class MapManager extends InputAdapter {
 					createdMiners++;
 					System.out.println("createdMiners: " + createdMiners);
 				}
-				
+
 				System.out.println("digCounter " + digCounter);
 				System.out.println("digFail " + digFailure);
 				System.out.println("miners: " + miners.size());
@@ -188,10 +188,10 @@ public class MapManager extends InputAdapter {
 		int minWaterLevel = 15;
 		waterLevel = rnd.nextInt((maxWaterLevel - minWaterLevel) + 1)
 				+ minWaterLevel;
-		
-		//remove this!
-//		waterLevel = 95;
-		
+
+		// remove this!
+		// waterLevel = 95;
+
 		System.out.println("waterlevel " + waterLevel);
 
 		createTileMap(world);
@@ -242,17 +242,39 @@ public class MapManager extends InputAdapter {
 				if (caveCell.getWallType() != WallType.SOLID) {
 					if (layerIndex == GameConstants.BACKGROUND_LAYER_1_INDEX) { // rocks
 																				// background
-						tmpRegion = GameResources.rockTiles.random();
-						flipX = false;
-						flipY = true;
-						type = "background_rock";
+						if (caveCell.getProperty() == "entrance") {
+							tmpRegion = GameResources.tilesAtlas
+									.findRegion("entrance");
+							flipX = false;
+							flipY = true;
+							type = "entrance";
+						} else {
+							tmpRegion = GameResources.rockTiles.random();
+							flipX = false;
+							flipY = true;
+						}
+
 						layer.setCell(
 								x,
 								y,
 								createCellforTiledMap(tmpRegion, flipX, flipY,
 										type));
-					} else if (layerIndex == GameConstants.BACKGROUND_LAYER_2_INDEX) { // water
-						if (y > waterLevel) {
+
+					} else if (layerIndex == GameConstants.BACKGROUND_LAYER_2_INDEX) {
+
+						if (caveCell.getProperty() == "shop") {
+							tmpRegion = GameResources.tilesAtlas
+									.findRegion("shop");
+							flipX = false;
+							flipY = true;
+							layer.setCell(
+									x,
+									y,
+									createCellforTiledMap(tmpRegion, flipX,
+											flipY, type));
+						}
+
+						else if (y > waterLevel) {
 							type = "water";
 							if (y == waterLevel + 1) {
 								tmpRegion = GameResources.waterSurfaceTexture;
@@ -268,13 +290,43 @@ public class MapManager extends InputAdapter {
 									createCellforTiledMap(tmpRegion, flipX,
 											flipY, type));
 						}
-					}
+					} else if (layerIndex == GameConstants.FOREGROUND_LAYER_1_INDEX) { // water
+																						// foreground
+						if (y > waterLevel) {
+							type = "foreground_object";
 
+							if (y + 1 < mapHeight) {
+								if (caveMap.getCellAt(x, y + 1).getWallType() == WallType.GROUND) {
+									if (rnd.nextFloat() > 0.7f) {
+										tmpRegion = GameResources.stuffInTheWater
+												.random();
+										flipX = rnd.nextBoolean();
+										flipY = true;
+
+										layer.setCell(
+												x,
+												y,
+												createCellforTiledMap(
+														tmpRegion, flipX,
+														flipY, type));
+
+										// TODO: this is just an ugly fix for
+										// ground tiles that are not flat
+										layer.setCell(
+												x,
+												y + 1,
+												createCellforTiledMap(
+														tmpRegion, flipX,
+														false, type));
+									}
+								}
+							}
+						}
+					}
 				}
 
 				if (caveCell.getCellType() == CellType.WALL
-						|| caveCell.getCellType() == CellType.CORNER_WALL
-						) {
+						|| caveCell.getCellType() == CellType.CORNER_WALL) {
 					if (layerIndex == GameConstants.BACKGROUND_LAYER_3_INDEX
 							&& world != null) { // walls
 						lineSegments.clear();
@@ -383,6 +435,7 @@ public class MapManager extends InputAdapter {
 				layers.add(createLayer(GameConstants.BACKGROUND_LAYER_2_INDEX));
 				layers.add(createLayer(GameConstants.BACKGROUND_LAYER_3_INDEX,
 						world));
+				layers.add(createLayer(GameConstants.FOREGROUND_LAYER_1_INDEX));
 
 				float unitScale = 1f / (float) GameConstants.TILE_SIZE;
 				mapRenderer = new OrthogonalTiledMapRenderer(map, unitScale);
@@ -495,6 +548,7 @@ public class MapManager extends InputAdapter {
 			mapRenderer.render(waterLayerIndex);
 
 			mapRenderer.getSpriteBatch().setColor(1, 1, 1, 1);
+			mapRenderer.render(foregroundLayers);
 			mapRenderer.render(wallLayerIndex);
 			// mapRenderer.render(foregroundLayers);
 		}

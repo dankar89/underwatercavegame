@@ -1,0 +1,172 @@
+tiles32_no_padding.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+corner
+  rotate: false
+  xy: 0, 192
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 6
+horizontalTile
+  rotate: false
+  xy: 96, 96
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 1
+lonelyVerticalTile
+  rotate: false
+  xy: 32, 32
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 2
+verticalTile
+  rotate: false
+  xy: 64, 0
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 1
+lonelyTile
+  rotate: false
+  xy: 96, 32
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 3
+corner
+  rotate: false
+  xy: 32, 160
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 1
+corner
+  rotate: false
+  xy: 0, 224
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 5
+horizontalTile
+  rotate: false
+  xy: 0, 96
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 4
+lonelyVerticalTile
+  rotate: false
+  xy: 64, 32
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 1
+lonelyTile
+  rotate: false
+  xy: 0, 64
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 2
+empty
+  rotate: false
+  xy: 0, 128
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+corner
+  rotate: false
+  xy: 32, 128
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 4
+horizontalTile
+  rotate: false
+  xy: 32, 96
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 3
+verticalTile
+  rotate: false
+  xy: 0, 0
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 3
+lonelyTile
+  rotate: false
+  xy: 32, 64
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 1
+lonelyCeiling
+  rotate: false
+  xy: 64, 64
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 2
+corner
+  rotate: false
+  xy: 64, 128
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 3
+corner
+  rotate: false
+  xy: 0, 160
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 7
+horizontalTile
+  rotate: false
+  xy: 64, 96
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 2
+thinHorizontalTile
+  rotate: false
+  xy: 0, 32
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 1
+verticalTile
+  rotate: false
+  xy: 32, 0
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 2
+lonelyCeiling
+  rotate: false
+  xy: 96, 64
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 1
+thinVerticalTile
+  rotate: false
+  xy: 96, 0
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 1
+corner
+  rotate: false
+  xy: 96, 128
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 2

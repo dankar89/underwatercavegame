@@ -29,13 +29,14 @@ public class CaveMap implements Serializable {
 	private ArrayList<Miner> miners = new ArrayList<Miner>();
 	private Miner startMiner;
 
+	// 1 = wall, 0 = empty, 2 = entrance, 3 = shop
 	private int[][] startArea = { 
-			{ 1, 1, 1, 1, 1, 1, 1, 1, 1},
-			{ 1, 1, 0, 0, 0, 0, 0, 0, 0}, 
-			{ 1, 1, 0, 0, 0, 0, 0, 0, 0},
-			{ 1, 1, 1, 1, 1, 1, 1, 0, 0},
-			{ 1, 1, 1, 1, 1, 1, 1, 0, 0}, 
-			{ 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{ 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+			{ 1, 1, 0, 0, 0, 0, 0, 0, 0 },
+			{ 1, 1, 2, 0, 3, 0, 0, 0, 0 },
+			{ 1, 1, 1, 1, 1, 1, 1, 0, 0 },
+			{ 1, 1, 1, 1, 1, 1, 1, 0, 0 },
+			{ 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 			};
 	private int startAreaWidth;
 	private int startAreaHeight;
@@ -58,7 +59,7 @@ public class CaveMap implements Serializable {
 		int[] array = startArea[startAreaHeight - 1];
 		for (int i = 0; i < array.length; i++) {
 			if (array[i] == 0)
-				return new Vector2(startX + i, endY-1);
+				return new Vector2(startX + i, endY - 1);
 		}
 
 		return new Vector2(mapWidth / 2, 1);
@@ -73,7 +74,7 @@ public class CaveMap implements Serializable {
 		startAreaHeight = startArea.length;
 		mapHalfWidth = mapWidth / 2;
 		startAreaHalfWidth = startAreaWidth / 2;
-		startX = (mapHalfWidth - startAreaHalfWidth) -1;
+		startX = (mapHalfWidth - startAreaHalfWidth) - 1;
 		endX = mapHalfWidth + (startAreaHalfWidth - 1);
 		startY = 0;
 		endY = startAreaHeight - 1;
@@ -112,7 +113,16 @@ public class CaveMap implements Serializable {
 					if (startArea[startAreaY][startAreaX] == 1) {
 						cell = new Cell(CellType.WALL, x, y);
 					} else {
-						cell = new Cell(CellType.EMPTY, x, y);
+						String prop = "";
+						if (startArea[startAreaY][startAreaX] == 2) {
+							prop = "entrance";
+						} else if (startArea[startAreaY][startAreaX] == 3) {
+							prop = "shop";
+						}
+						
+						cell = new Cell(CellType.EMPTY, x, y, prop);
+						
+							
 					}
 					mapArray[x][y] = cell;
 					startAreaY++;
@@ -592,7 +602,7 @@ public class CaveMap implements Serializable {
 		int above = y - 1;
 		int below = y + 1;
 
-		//FIXME: Why do I need -3 here? 
+		// FIXME: Why do I need -3 here?
 		if (right < mapWidth - 3) {
 			if (getCellAt(right, y).getCellType() == type)
 				adjacentCells.add(getCellAt(right, y));

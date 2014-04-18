@@ -6,6 +6,7 @@ public class Cell {
 	private int x, y;
 	private CellType cellType;
 	private WallType wallType;
+	private String property;
 
 	public boolean isCorner() {
 //		if ((wallType != WallType.LOWER_LEFT_CONVEX
@@ -16,6 +17,10 @@ public class Cell {
 			return true;
 		else
 			return false;
+	}
+	
+	public String getProperty(){
+		return this.property;
 	}
 
 	public int getX() {
@@ -100,5 +105,14 @@ public class Cell {
 		this.x = (int) pos.x;
 		this.y = (int) pos.y;
 		this.setPos(pos);
+	}
+	
+	public Cell(CellType type, int x, int y, String property) {
+		this.wallType = WallType.NONE;
+		this.cellType = type;
+		this.x = x;
+		this.y = y;
+		this.setPos(new Vector2(this.x, this.y));
+		this.property = property;
 	}
 }
