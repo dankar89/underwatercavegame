@@ -1,19 +1,28 @@
 package common;
 
-import java.util.ArrayList;
-
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
-
 import caveGame.PhysicsDataJsonParser;
 import caveGame.TileShapeData;
 
-public class GameResources {
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.loaders.SkinLoader;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane.ScrollPaneStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.SelectBox.SelectBoxStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
+
+public class Assets {
 	private static AssetManager assetManager;
 
 	// tilemap regions
@@ -43,17 +52,49 @@ public class GameResources {
 	public static TextureAtlas spriteAtlas;
 	public static TextureAtlas playerSpriteAtlas;
 
-	public static void init() {
+	public static BitmapFont font1;
+
+	public static LabelStyle labelStyle;
+	public static TextButtonStyle buttonStyle;
+	public static SelectBoxStyle selectBoxStyle;
+	public static TextFieldStyle textFieldStyle;
+
+	public static Skin defaultSkin;
+	
+	public static void load() {
 		assetManager = new AssetManager();
 		loadResources();
 		getResources();
 	}
 
 	private static void loadResources() {
+		
+		font1 = new BitmapFont(Gdx.files.internal("data/myFont.fnt"),
+				Gdx.files.internal("data/myFont.png"), false);
+		font1.setColor(Color.GREEN);
+		font1.getRegion().getTexture()
+				.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
+
+		defaultSkin = new Skin(Gdx.files.internal("skins/uiskin.json"));
+		
+		labelStyle = new LabelStyle(font1, Color.YELLOW);
+		buttonStyle = new TextButtonStyle();
+		buttonStyle.font = font1;
+		buttonStyle.overFontColor = Color.RED;
+		buttonStyle.fontColor = Color.WHITE;
+		
+		selectBoxStyle = new SelectBoxStyle();
+		selectBoxStyle.font = font1;
+		selectBoxStyle.fontColor = Color.WHITE;
+		
+		textFieldStyle = new TextFieldStyle();
+		textFieldStyle.font = font1;
+		textFieldStyle.fontColor = Color.WHITE;
 
 		// queue stuff for loading
 		assetManager.load("textures/terrain/tiles128.txt", TextureAtlas.class);
-		assetManager.load("textures/diver/test/diver64.txt", TextureAtlas.class);
+		assetManager
+				.load("textures/diver/test/diver64.txt", TextureAtlas.class);
 		assetManager.load("textures/player/player64.txt", TextureAtlas.class);
 
 		assetManager.load("data/whitesquare.png", Texture.class);
@@ -69,8 +110,8 @@ public class GameResources {
 	private static void getResources() {
 		// load the vertex data for the tiles
 		shapeDataMap = PhysicsDataJsonParser.parse("data/physicsData.json");
-				
-//		testPlayer = assetManager.get("textures/player6.png");
+
+		// testPlayer = assetManager.get("textures/player6.png");
 		onePixelTexture = assetManager.get("hud/onePixel.png");
 		tilesAtlas = assetManager.get("textures/terrain/tiles128.txt");
 		spriteAtlas = assetManager.get("textures/diver/test/diver64.txt");
@@ -87,14 +128,14 @@ public class GameResources {
 		rockTiles = tilesAtlas.findRegions("rocks");
 		stuffInTheWater = tilesAtlas.findRegions("seaweed");
 		wallRegion = tilesAtlas.findRegion("empty");
-		waterTexture =  tilesAtlas.findRegion("water");
-		waterSurfaceTexture =  tilesAtlas.findRegion("waterSurface");
-		
+		waterTexture = tilesAtlas.findRegion("water");
+		waterSurfaceTexture = tilesAtlas.findRegion("waterSurface");
+
 		// player sprites
-		
-		//TODO: Remove this test!!
+
+		// TODO: Remove this test!!
 		playerSprites = playerSpriteAtlas.findRegions("player");
-		diverSprites = spriteAtlas.findRegions("diver");		
+		diverSprites = spriteAtlas.findRegions("diver");
 	}
 
 	public static void dispose() {

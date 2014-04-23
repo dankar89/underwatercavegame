@@ -1,5 +1,6 @@
 package common;
 
+import caveGame.NetworkData;
 import caveGame.Player;
 
 import com.badlogic.gdx.Gdx;
@@ -81,27 +82,15 @@ public class HUD {
 		minimapCamera.zoom = 25;
 		minimapBatch = new SpriteBatch();
 
-		miniMapPlayerSprite = new Sprite(GameResources.onePixelTexture);
+		miniMapPlayerSprite = new Sprite(Assets.onePixelTexture);
 		miniMapPlayerSprite.setColor(Color.RED);
 		// miniMapPlayerSprite.setOrigin(2, 2);
 		miniMapPlayerSprite.scale(3f);
 	}
 
 	public void draw() {
-
-		if (GameConstants.isAndroid)
+		if (Globals.isAndroid)
 			stage.draw();
-		// hudBatch.begin();
-
-		// if (Globals.debug) {
-		// font.draw(
-		// hudBatch,
-		// "FPS: "
-		// + Integer.toString(Gdx.graphics
-		// .getFramesPerSecond()), 20, h - 20);
-		// }
-		// hudBatch.end();
-
 	}
 
 	public void drawMiniMap(CaveMap caveMap, Vector2 playerPos, int waterLevel) {
@@ -116,13 +105,13 @@ public class HUD {
 			for (int y = 0; y < caveMap.getHeight(); y++) {
 				if (caveMap.getCellAt(x, y).getCellType() == CellType.WALL) {
 					minimapBatch.setColor(Color.BLACK);
-				} else if(y >= waterLevel) {
+				} else if (y >= waterLevel) {
 					minimapBatch.setColor(0, 166, 255, 255);
 				} else {
 					minimapBatch.setColor(Color.WHITE);
 				}
-				minimapBatch.draw(GameResources.onePixelTexture, x
-						+ miniMapOffsetX, y + miniMapOffsetY);
+				minimapBatch.draw(Assets.onePixelTexture, x + miniMapOffsetX, y
+						+ miniMapOffsetY);
 			}
 		}
 
@@ -141,20 +130,18 @@ public class HUD {
 
 		font.draw(hudBatch, "player body pos: "
 				+ player.getBody().getPosition(), 20, h - 40);
-		font.draw(hudBatch, "angleRad: " + player.getBody().getAngle(), 20,
-				h - 60);
-		font.draw(hudBatch,
-				"angleDeg: " + Math.toDegrees(player.getBody().getAngle()), 20,
-				h - 80);
-		 font.draw(hudBatch, "bodies: " + world.getBodyCount(),
-		 20,
-		 h - 100);
+		font.draw(hudBatch, "num of other players: " + NetworkData.players.size(), 20, h - 60);
+		font.draw(hudBatch, "roomProps: " + NetworkData.roomProperties.toString(), 20, h - 80);
+//		font.draw(hudBatch,
+//				"angleDeg: " + Math.toDegrees(player.getBody().getAngle()), 20,
+//				h - 80);
+		font.draw(hudBatch, "bodies: " + world.getBodyCount(), 20, h - 100);
 
 		hudBatch.end();
 	}
 
 	public void update(float deltaTime) {
-		if (GameConstants.isAndroid) {
+		if (Globals.isAndroid) {
 			stage.act(deltaTime);
 		} else {
 			// TODO: unfocus touchpad!!!

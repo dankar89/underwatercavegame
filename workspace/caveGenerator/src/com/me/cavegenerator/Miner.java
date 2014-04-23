@@ -1,22 +1,17 @@
 package com.me.cavegenerator;
 
 import java.util.ArrayList;
-import java.util.Random;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Timer;
-import com.badlogic.gdx.utils.Timer.Task;
 import com.me.cavegenerator.Cell.CellType;
+import common.Globals;
 
 public class Miner {
 	private boolean alive;
 	private Vector2 currentPos;
 	private Cell currentCell;
-	private Random rnd;
 	private int digCounter = 0;
 	private float chanceToDigVertically;
 	private float chanceToDigHorizontally;
@@ -39,13 +34,12 @@ public class Miner {
 		this.alive = true;
 		this.currentPos = startPos;
 		// this.currentCell = caveMap.getCellAt(startPos);
-		this.rnd = new Random();
 
 		chanceToDigHorizontally = 0.5f;
 		chanceToDigVertically = 0.5f;
 		
-		direction.x = rnd.nextInt(3) -1;
-		direction.y = rnd.nextInt(3) -1;
+		direction.x = Globals.random.nextInt(3) -1;
+		direction.y = Globals.random.nextInt(3) -1;
 	}
 
 	public Miner(Cell startCell, CaveMap caveMap) {
@@ -53,7 +47,6 @@ public class Miner {
 
 		this.alive = true;
 		this.currentCell = startCell;
-		this.rnd = new Random();
 	}
 
 	public boolean isAlive() {
@@ -74,8 +67,8 @@ public class Miner {
 				while (true) { // maybe add timer instead??
 					if(randPos) {
 						//select a random cell and see if it is empty
-						int x = rnd.nextInt(caveMap.getWidth()-2) +1;
-						int y = rnd.nextInt(caveMap.getHeight()-2) +1;
+						int x = Globals.random.nextInt(caveMap.getWidth()-2) +1;
+						int y = Globals.random.nextInt(caveMap.getHeight()-2) +1;
 						
 						Cell cell = caveMap.getCellAt(x, y);
 						if(cell.getCellType() == CellType.EMPTY) {
@@ -86,12 +79,12 @@ public class Miner {
 						adjacentCells = caveMap.getAdjacentCellsOfType(this.currentPos,
 								CellType.WALL);
 						if (!adjacentCells.isEmpty()) {
-							this.currentPos = adjacentCells.get(rnd
+							this.currentPos = adjacentCells.get(Globals.random
 									.nextInt(adjacentCells.size())).getPos();
 							return true;
 						}
 						adjacentCells = caveMap.getAdjacentCells(this.currentPos);
-						Cell rndCell = adjacentCells.get(rnd.nextInt(adjacentCells
+						Cell rndCell = adjacentCells.get(Globals.random.nextInt(adjacentCells
 								.size()));
 						this.currentPos = rndCell.getPos();
 					}										
@@ -104,7 +97,7 @@ public class Miner {
 					}
 
 					adjacentCells = caveMap.getAdjacentCells(this.currentPos);
-					Cell rndCell = adjacentCells.get(rnd.nextInt(adjacentCells
+					Cell rndCell = adjacentCells.get(Globals.random.nextInt(adjacentCells
 							.size()));
 					this.currentPos = rndCell.getPos();
 				}
@@ -147,7 +140,7 @@ public class Miner {
 			} else {
 				try {
 					// Dig the current cell
-					int rndIndex = rnd.nextInt(adjacentCells.size());
+					int rndIndex = Globals.random.nextInt(adjacentCells.size());
 
 					Vector2 rndCellPos = adjacentCells.get(rndIndex).getPos();
 					if(caveMap.getCellAt(rndCellPos).getCellType() == CellType.LOCKED_WALL){

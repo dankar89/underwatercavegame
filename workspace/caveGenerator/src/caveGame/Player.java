@@ -6,7 +6,6 @@ import net.dermetfan.utils.libgdx.box2d.Box2DUtils;
 import net.dermetfan.utils.libgdx.graphics.AnimatedBox2DSprite;
 import net.dermetfan.utils.libgdx.graphics.AnimatedSprite;
 import net.dermetfan.utils.libgdx.graphics.Box2DSprite;
-
 import box2dLight.ConeLight;
 import box2dLight.PointLight;
 import box2dLight.RayHandler;
@@ -15,12 +14,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -29,8 +26,8 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import common.Assets;
 import common.GameConstants;
-import common.GameResources;
 import common.Globals;
 
 public class Player extends InputAdapter {
@@ -44,7 +41,9 @@ public class Player extends InputAdapter {
 	AnimatedSprite animatedSprite;
 	AnimatedBox2DSprite animatedBox2dSprite;
 	Box2DSprite box2dSprite;
+	
 
+	
 	private enum LookDirection {
 		LEFT, RIGHT, UP, DOWN,
 	}
@@ -86,7 +85,7 @@ public class Player extends InputAdapter {
 		bodyDef.position.set(startPos);
 		body = world.createBody(bodyDef);
 
-		swimAnimation = new Animation(1 / 3f, GameResources.playerSprites);
+		swimAnimation = new Animation(1 / 3f, Assets.playerSprites);
 		swimAnimation.setPlayMode(Animation.LOOP);
 
 		animatedBox2dSprite = new AnimatedBox2DSprite(new AnimatedSprite(
@@ -184,16 +183,12 @@ public class Player extends InputAdapter {
 		} else
 			movement.y = 0;
 
-		if (GameConstants.isAndroid)
+		if (Globals.isAndroid)
 			flashlightEnabled = true;
 
 		if (Globals.lightsEnabled)
 			flashlight.setActive(isFlashlightEnabled());
 
-		if (Gdx.input.isTouched()) {
-			// System.out.println("mouseWorldPos: " + mouseWorldPos);
-			// System.out.println((flashlightAngle * MathUtils.radDeg));
-		}
 
 		lookAngle = MathUtils.atan2(mouseWorldPos.y - getPos().y,
 				mouseWorldPos.x - getPos().x) * MathUtils.radDeg;
@@ -363,19 +358,19 @@ public class Player extends InputAdapter {
 		switch (keycode) {
 		case Keys.LEFT:
 		case Keys.A:
-			System.out.println(lookDirection);
-			System.out.println(animatedBox2dSprite.isFlipX());
+//			System.out.println(lookDirection);
+//			System.out.println(animatedBox2dSprite.isFlipX());
 			if (lookDirection == LookDirection.LEFT && !animatedBox2dSprite.isFlipX()) {
-				System.out.println("moving left");
+//				System.out.println("moving left");
 				animatedBox2dSprite.flipFrames(true, false);
 			}
 			break;
 		case Keys.RIGHT:
 		case Keys.D:
-			System.out.println(lookDirection);
-			System.out.println(animatedBox2dSprite.isFlipX());
+//			System.out.println(lookDirection);
+//			System.out.println(animatedBox2dSprite.isFlipX());
 			if (lookDirection == LookDirection.RIGHT && animatedBox2dSprite.isFlipX()) {
-				System.out.println("moving right");
+//				System.out.println("moving right");
 				animatedBox2dSprite.flipFrames(true, false);
 			}
 			break;

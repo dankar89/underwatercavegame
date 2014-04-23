@@ -26,7 +26,7 @@ import com.me.cavegenerator.Cell.CellType;
 import com.me.cavegenerator.Cell.WallType;
 
 import common.GameConstants;
-import common.GameResources;
+import common.Assets;
 import common.Globals;
 
 public class CopyOfMapManager extends InputAdapter {
@@ -165,7 +165,7 @@ public class CopyOfMapManager extends InputAdapter {
 			com.me.cavegenerator.Cell caveCell;
 			MyTiledMapTile mapTile = null;
 
-			if (GameResources.isReady()) {
+			if (Assets.isReady()) {
 				for (int i = 0; i < numOfLayers; i++) {
 					TiledMapTileLayer layer = new TiledMapTileLayer(mapWidth,
 							mapHeight, 32, 32);
@@ -181,55 +181,55 @@ public class CopyOfMapManager extends InputAdapter {
 								if (caveCell.getWallType() == WallType.LEFT) {
 									flipX = true;
 									flipY = rnd.nextBoolean();
-									tmpRegion = GameResources.verticalTiles
-											.get(rnd.nextInt(GameResources.verticalTiles.size));
+									tmpRegion = Assets.verticalTiles
+											.get(rnd.nextInt(Assets.verticalTiles.size));
 								} else if (caveCell.getWallType() == WallType.LONELY_LEFT) {
 									flipX = false;
 									flipY = rnd.nextBoolean();
-									tmpRegion = GameResources.lonelyVerticalTiles
-											.get(rnd.nextInt(GameResources.lonelyVerticalTiles.size));
+									tmpRegion = Assets.lonelyVerticalTiles
+											.get(rnd.nextInt(Assets.lonelyVerticalTiles.size));
 								} else if (caveCell.getWallType() == WallType.RIGHT) {
 									flipX = false;
 									flipY = rnd.nextBoolean();
-									tmpRegion = GameResources.verticalTiles
-											.get(rnd.nextInt(GameResources.verticalTiles.size));
+									tmpRegion = Assets.verticalTiles
+											.get(rnd.nextInt(Assets.verticalTiles.size));
 								} else if (caveCell.getWallType() == WallType.LONELY_RIGHT) {
 									flipX = true;
 									flipY = rnd.nextBoolean();
-									tmpRegion = GameResources.lonelyVerticalTiles
-											.get(rnd.nextInt(GameResources.lonelyVerticalTiles.size));
+									tmpRegion = Assets.lonelyVerticalTiles
+											.get(rnd.nextInt(Assets.lonelyVerticalTiles.size));
 								} else if (caveCell.getWallType() == WallType.CEILING) {
 									flipX = rnd.nextBoolean();
 									flipY = false;
-									tmpRegion = GameResources.horizontalTiles
-											.get(rnd.nextInt(GameResources.horizontalTiles.size));
+									tmpRegion = Assets.horizontalTiles
+											.get(rnd.nextInt(Assets.horizontalTiles.size));
 								} else if (caveCell.getWallType() == WallType.LONELY_TOP) {
 									flipX = rnd.nextBoolean();
 									flipY = true;
-									tmpRegion = GameResources.lonelyHorizontalTiles
-											.get(rnd.nextInt(GameResources.lonelyHorizontalTiles.size));
+									tmpRegion = Assets.lonelyHorizontalTiles
+											.get(rnd.nextInt(Assets.lonelyHorizontalTiles.size));
 								} else if (caveCell.getWallType() == WallType.GROUND) {
 									flipX = rnd.nextBoolean();
 									flipY = true;
-									tmpRegion = GameResources.horizontalTiles
-											.get(rnd.nextInt(GameResources.horizontalTiles.size));
+									tmpRegion = Assets.horizontalTiles
+											.get(rnd.nextInt(Assets.horizontalTiles.size));
 								} else if (caveCell.getWallType() == WallType.LONELY_BOTTOM) {
 									flipX = rnd.nextBoolean();
 									flipY = false;
-									tmpRegion = GameResources.lonelyHorizontalTiles
-											.get(rnd.nextInt(GameResources.lonelyHorizontalTiles.size));
+									tmpRegion = Assets.lonelyHorizontalTiles
+											.get(rnd.nextInt(Assets.lonelyHorizontalTiles.size));
 								} else if (caveCell.getWallType() == WallType.LEFT_RIGHT) {
 									flipX = false;
 									flipY = rnd.nextBoolean();
-									tmpRegion = GameResources.thinVerticalTiles
-											.get(rnd.nextInt(GameResources.thinVerticalTiles.size));
+									tmpRegion = Assets.thinVerticalTiles
+											.get(rnd.nextInt(Assets.thinVerticalTiles.size));
 								} else if (caveCell.getWallType() == WallType.GROUND_CEILING) {
 									flipX = rnd.nextBoolean();
 									flipY = false;
-									tmpRegion = GameResources.thinHorizontalTiles
-											.get(rnd.nextInt(GameResources.thinHorizontalTiles.size));
+									tmpRegion = Assets.thinHorizontalTiles
+											.get(rnd.nextInt(Assets.thinHorizontalTiles.size));
 								} else {
-									tmpRegion = GameResources.wallRegion;
+									tmpRegion = Assets.wallRegion;
 								}
 
 								mapTile = new MyTiledMapTile(tmpRegion);
@@ -256,8 +256,8 @@ public class CopyOfMapManager extends InputAdapter {
 								}
 
 								mapTile = new MyTiledMapTile(
-										GameResources.cornerTiles.get(rnd
-												.nextInt(GameResources.cornerTiles.size)));
+										Assets.cornerTiles.get(rnd
+												.nextInt(Assets.cornerTiles.size)));
 
 								cell = new Cell();
 								cell.setFlipHorizontally(flipX);
