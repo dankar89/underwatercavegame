@@ -1,10 +1,12 @@
-package caveGame;
+package multiplayer;
 
 import java.util.HashMap;
 
 import net.dermetfan.utils.libgdx.AnnotationAssetManager.Asset;
 import kryonet.NetworkClient;
 import kryonet.NetworkServer;
+
+import caveGame.CaveGame;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -44,6 +46,9 @@ public class HostMultiplayerGameScreen implements Screen {
 
 	private Label mTypeLabel;
 	private SelectBox mTypeDropdown;
+
+	private Label mWaterLevelLabel;
+	private SelectBox mWaterLevelDropdown;
 
 	private String mWorldSeed;
 	private String mRndString;
@@ -85,6 +90,11 @@ public class HostMultiplayerGameScreen implements Screen {
 		mMaxPlayersDropdown = new SelectBox(numPlayersArray, Assets.defaultSkin);
 		mMaxPlayersDropdown.setSelection(0);
 
+		mWaterLevelLabel = new Label("WaterLevel:", Assets.defaultSkin);
+		String[] waterLevelArray = { "High", "Medium", "Low" };
+		mWaterLevelDropdown = new SelectBox(waterLevelArray, Assets.defaultSkin);
+		mWaterLevelDropdown.setSelection(1);
+
 		mHostButton = new TextButton("Host game", Assets.defaultSkin);
 		table.columnDefaults(0).spaceRight(10f);
 		table.add(mNameLabel).right();
@@ -93,11 +103,14 @@ public class HostMultiplayerGameScreen implements Screen {
 		table.add(mTypeLabel).right();
 		table.add(mTypeDropdown).left();
 		table.row().spaceTop(10);
+		table.add(mMaxPlayersLabel).right();
+		table.add(mMaxPlayersDropdown).left();
+		table.row().spaceTop(40);
 		table.add(mWorldSeedLabel).right();
 		table.add(mWorldSeedTextField).left();
 		table.row().spaceTop(10);
-		table.add(mMaxPlayersLabel).right();
-		table.add(mMaxPlayersDropdown).left();
+		table.add(mWaterLevelLabel).right();
+		table.add(mWaterLevelDropdown).left();
 		table.row().spaceTop(40f).colspan(2);
 		table.add(mHostButton);
 
@@ -125,6 +138,8 @@ public class HostMultiplayerGameScreen implements Screen {
 				System.out.println("Name field is empty!");
 				return;
 			}
+			
+			roomProperties.put("waterLevel", mWaterLevelDropdown.getSelection());
 
 			roomProperties.put("type", mTypeDropdown.getSelection());
 			roomProperties

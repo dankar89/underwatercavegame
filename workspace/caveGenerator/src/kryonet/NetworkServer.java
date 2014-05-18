@@ -32,8 +32,8 @@ public class NetworkServer extends Listener {
 
 	public void connected(Connection c) {
 		NetworkPlayer player = new NetworkPlayer();
-		player.x = 50;
-		player.y = 2;
+		// player.x = 50;
+		// player.y = 2;
 		player.c = c;
 
 		PlayerAddRequest playerAddReq = new PlayerAddRequest();
@@ -74,14 +74,30 @@ public class NetworkServer extends Listener {
 	}
 
 	public void received(Connection c, Object o) {
-		if (o instanceof PlayerUpdateRequest) {
-			PlayerUpdateRequest req = (PlayerUpdateRequest) o;
+		if (o instanceof PlayerPositionUpdateRequest) {
+			PlayerPositionUpdateRequest req = (PlayerPositionUpdateRequest) o;
 			players.get(c.getID()).x = req.x;
 			players.get(c.getID()).y = req.y;
 
 			req.id = c.getID();
 			server.sendToAllExceptUDP(c.getID(), req);
-			System.out.println("Received and sent a playerUpdateRequest");
+			// System.out.println("Received and sent a playerUpdateRequest");
+		} else if (o instanceof PlayerMouseUpdateRequest) {
+			PlayerMouseUpdateRequest req = (PlayerMouseUpdateRequest) o;
+			players.get(c.getID()).mouseX = req.mouseX;
+			players.get(c.getID()).mouseY = req.mouseY;
+			req.id = c.getID();
+			server.sendToAllExceptUDP(c.getID(), req);
+		} else if (o instanceof PlayerKeyDownUpdateRequest) {
+			PlayerKeyDownUpdateRequest req = (PlayerKeyDownUpdateRequest) o;
+			players.get(c.getID()).lastKeyDown = req.lastKeyDown;
+			req.id = c.getID();
+			server.sendToAllExceptUDP(c.getID(), req);
+		} else if (o instanceof PlayerKeyUpUpdateRequest) {
+			PlayerKeyUpUpdateRequest req = (PlayerKeyUpUpdateRequest) o;
+			players.get(c.getID()).lastKeyUp = req.lastKeyUp;
+			req.id = c.getID();
+			server.sendToAllExceptUDP(c.getID(), req);
 		} else if (o instanceof PacketPlayerRoomStatus) {
 			// receive room status update from one player and pass it on to the
 			// other players in the room
@@ -96,8 +112,7 @@ public class NetworkServer extends Listener {
 					startGame = false;
 				}
 			}
-			
-			
+
 		}
 	}
 }

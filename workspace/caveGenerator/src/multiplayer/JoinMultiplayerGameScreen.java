@@ -1,10 +1,12 @@
-package caveGame;
+package multiplayer;
 
 import java.util.HashMap;
 
 import net.dermetfan.utils.libgdx.AnnotationAssetManager.Asset;
 import kryonet.NetworkClient;
 import kryonet.NetworkServer;
+
+import caveGame.CaveGame;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;

@@ -3,6 +3,8 @@ package com.me.cavegenerator;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import multiplayer.NetworkData;
+
 import caveGame.TileShapeData;
 
 import com.badlogic.gdx.Gdx;
@@ -72,7 +74,13 @@ public class MapManager extends InputAdapter {
 	PolygonShape boxShape;
 	BodyDef bodyDef;
 
-	public MapManager(int mapWidth, int mapHeight, OrthographicCamera cam) {
+	public MapManager(int mapWidth, int mapHeight, int waterLevel,
+			OrthographicCamera cam) {
+		this.mapWidth = mapWidth;
+		this.mapHeight = mapHeight;
+
+		this.waterLevel = waterLevel;
+
 		boxShape = new PolygonShape();
 		bodyDef = new BodyDef();
 
@@ -84,9 +92,6 @@ public class MapManager extends InputAdapter {
 		digCounter = 0;
 		digFailure = 0;
 
-		this.mapWidth = mapWidth;
-		this.mapHeight = mapHeight;
-
 		int w = Gdx.graphics.getWidth();
 		int h = Gdx.graphics.getHeight();
 
@@ -96,6 +101,10 @@ public class MapManager extends InputAdapter {
 		miners.add(startMiner);
 
 		this.map = new TiledMap();
+	}
+
+	private void init() {
+
 	}
 
 	public void generateMap(World world) {
@@ -142,10 +151,6 @@ public class MapManager extends InputAdapter {
 		}
 
 		caveMap.cleanUp(5);
-		int maxWaterLevel = 40;
-		int minWaterLevel = 15;
-		waterLevel = Globals.random
-				.nextInt((maxWaterLevel - minWaterLevel) + 1) + minWaterLevel;
 
 		createTileMap(world);
 		mapGenerationDone = true;
@@ -267,8 +272,8 @@ public class MapManager extends InputAdapter {
 									float rndFloat = Globals.random.nextFloat();
 									if (rndFloat > 0.7f) {
 										tmpRegion = Assets.stuffInTheWater
-												.get(Globals
-														.random.nextInt(Assets.stuffInTheWater.size));
+												.get(Globals.random
+														.nextInt(Assets.stuffInTheWater.size));
 										flipX = Globals.random.nextBoolean();
 										flipY = true;
 
@@ -303,43 +308,44 @@ public class MapManager extends InputAdapter {
 						if (caveCell.getWallType() == WallType.LEFT) {
 							flipX = true;
 							flipY = Globals.random.nextBoolean();
-							tmpRegion = Assets.verticalTiles.get(Globals
-									.random.nextInt(Assets.verticalTiles.size));
+							tmpRegion = Assets.verticalTiles.get(Globals.random
+									.nextInt(Assets.verticalTiles.size));
 						} else if (caveCell.getWallType() == WallType.LONELY_LEFT) {
 							flipX = false;
 							flipY = Globals.random.nextBoolean();
 							tmpRegion = Assets.lonelyVerticalTiles
-									.get(Globals
-											.random.nextInt(Assets.lonelyVerticalTiles.size));
+									.get(Globals.random
+											.nextInt(Assets.lonelyVerticalTiles.size));
 						} else if (caveCell.getWallType() == WallType.RIGHT) {
 							flipX = false;
 							flipY = Globals.random.nextBoolean();
-							tmpRegion = Assets.verticalTiles.get(Globals
-									.random.nextInt(Assets.verticalTiles.size));
+							tmpRegion = Assets.verticalTiles.get(Globals.random
+									.nextInt(Assets.verticalTiles.size));
 						} else if (caveCell.getWallType() == WallType.LONELY_RIGHT) {
 							flipX = true;
 							flipY = Globals.random.nextBoolean();
 							tmpRegion = Assets.lonelyVerticalTiles
-									.get(Globals
-											.random.nextInt(Assets.lonelyVerticalTiles.size));
+									.get(Globals.random
+											.nextInt(Assets.lonelyVerticalTiles.size));
 						} else if (caveCell.getWallType() == WallType.CEILING) {
 							flipX = Globals.random.nextBoolean();
 							flipY = false;
-							tmpRegion = Assets.horizontalTiles.get(Globals
-									.random.nextInt(Assets.horizontalTiles.size));
+							tmpRegion = Assets.horizontalTiles
+									.get(Globals.random
+											.nextInt(Assets.horizontalTiles.size));
 						} else if (caveCell.getWallType() == WallType.LONELY_TOP) {
 							flipX = Globals.random.nextBoolean();
 							flipY = true;
 							tmpRegion = Assets.lonelyHorizontalTiles
-									.get(Globals
-											.random.nextInt(Assets.lonelyHorizontalTiles.size));
+									.get(Globals.random
+											.nextInt(Assets.lonelyHorizontalTiles.size));
 						} else if (caveCell.getWallType() == WallType.GROUND) {
 							flipX = Globals.random.nextBoolean();
 							flipY = true;
 							if (y > waterLevel) {
 								tmpRegion = Assets.horizontalTiles
-										.get(Globals
-												.random.nextInt(Assets.horizontalTiles.size));
+										.get(Globals.random
+												.nextInt(Assets.horizontalTiles.size));
 							} else {
 								tmpRegion = Assets.horizontalTiles.get(0);
 							}
@@ -347,24 +353,25 @@ public class MapManager extends InputAdapter {
 							flipX = Globals.random.nextBoolean();
 							flipY = false;
 							tmpRegion = Assets.lonelyHorizontalTiles
-									.get(Globals
-											.random.nextInt(Assets.lonelyHorizontalTiles.size));
+									.get(Globals.random
+											.nextInt(Assets.lonelyHorizontalTiles.size));
 						} else if (caveCell.getWallType() == WallType.LEFT_RIGHT) {
 							flipX = false;
 							flipY = Globals.random.nextBoolean();
-							tmpRegion = Assets.thinVerticalTiles.get(Globals
-									.random.nextInt(Assets.thinVerticalTiles.size));
+							tmpRegion = Assets.thinVerticalTiles
+									.get(Globals.random
+											.nextInt(Assets.thinVerticalTiles.size));
 						} else if (caveCell.getWallType() == WallType.GROUND_CEILING) {
 							flipX = Globals.random.nextBoolean();
 							flipY = false;
 							tmpRegion = Assets.thinHorizontalTiles
-									.get(Globals
-											.random.nextInt(Assets.thinHorizontalTiles.size));
+									.get(Globals.random
+											.nextInt(Assets.thinHorizontalTiles.size));
 						} else if (caveCell.getWallType() == WallType.SOLID) {
 							tmpRegion = Assets.wallRegion;
 						} else { // corner tiles
-							tmpRegion = Assets.cornerTiles.get(Globals
-									.random.nextInt(Assets.cornerTiles.size));
+							tmpRegion = Assets.cornerTiles.get(Globals.random
+									.nextInt(Assets.cornerTiles.size));
 
 							if (caveCell.getWallType() == WallType.UPPER_LEFT_CONVEX) {
 								flipX = false;
@@ -385,8 +392,6 @@ public class MapManager extends InputAdapter {
 						if (caveCell.getWallType() != WallType.SOLID) {
 							textureName = tmpRegion.name + "_"
 									+ tmpRegion.index + ".png";
-							System.out.println("[" + x + "][" + y
-									+ " 	   texture name: " + textureName);
 							createTileBody(world,
 									shapeDataMap.get(textureName), x, y, flipX,
 									flipY);

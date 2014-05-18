@@ -1,7 +1,10 @@
-package caveGame;
+package multiplayer;
 
 import kryonet.NetworkClient;
 import kryonet.NetworkServer;
+
+import caveGame.CaveGame;
+import caveGame.MainMenuScreen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;

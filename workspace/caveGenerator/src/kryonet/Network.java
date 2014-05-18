@@ -19,7 +19,10 @@ public class Network {
 		kryo.register(PlayerAddResponse.class);
 		kryo.register(PlayerRemoveRequest.class);
 		kryo.register(PlayeRemoveResponse.class);
-		kryo.register(PlayerUpdateRequest.class);
+		kryo.register(PlayerPositionUpdateRequest.class);
+		kryo.register(PlayerMouseUpdateRequest.class);
+		kryo.register(PlayerKeyDownUpdateRequest.class);
+		kryo.register(PlayerKeyUpUpdateRequest.class);
 		kryo.register(PlayerUpdateResponse.class);
 		kryo.register(PropertiesResponse.class);
 		kryo.register(PacketPlayerRoomStatus.class);

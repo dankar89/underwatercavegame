@@ -1,4 +1,4 @@
-package caveGame;
+package multiplayer;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -10,6 +10,8 @@ import kryonet.Network.PlayerRoomStatus;
 import kryonet.NetworkClient;
 import kryonet.NetworkPlayer;
 import kryonet.PacketPlayerRoomStatus;
+
+import caveGame.CaveGame;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -113,7 +115,7 @@ public class MultiplayerRoomScreen implements Screen {
 //				System.out.println("size1 :" + NetworkData.players.size());
 //				System.out.println("size2 :" + mListItems.size());
 			}
-		}, 0, 5000, TimeUnit.MILLISECONDS);
+		}, 0, 3, TimeUnit.SECONDS);
 	}
 
 	public void draw() {

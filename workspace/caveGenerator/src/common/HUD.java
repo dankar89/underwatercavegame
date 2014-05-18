@@ -1,6 +1,6 @@
 package common;
 
-import caveGame.NetworkData;
+import multiplayer.NetworkData;
 import caveGame.Player;
 
 import com.badlogic.gdx.Gdx;
@@ -35,6 +35,9 @@ public class HUD {
 	private OrthographicCamera minimapCamera;
 
 	private Sprite miniMapPlayerSprite;
+	private Sprite miniMapRemotePlayer1Sprite;
+	private Sprite miniMapRemotePlayer2Sprite;
+	private Sprite miniMapRemotePlayer3Sprite;
 	private Sprite miniMapWallSprite;
 	private float miniMapOffsetX = 0;
 	private float miniMapOffsetY = 0;
@@ -84,8 +87,21 @@ public class HUD {
 
 		miniMapPlayerSprite = new Sprite(Assets.onePixelTexture);
 		miniMapPlayerSprite.setColor(Color.RED);
-		// miniMapPlayerSprite.setOrigin(2, 2);
 		miniMapPlayerSprite.scale(3f);
+
+		if (Globals.isCurrentGameMultiplayer) {
+			miniMapRemotePlayer1Sprite = new Sprite(Assets.onePixelTexture);
+			miniMapRemotePlayer1Sprite.setColor(Color.ORANGE);
+			miniMapRemotePlayer1Sprite.scale(3f);
+
+			// miniMapRemotePlayer2Sprite = new Sprite(Assets.onePixelTexture);
+			// miniMapRemotePlayer2Sprite.setColor(Color.CYAN);
+			// miniMapRemotePlayer2Sprite.scale(3f);
+			//
+			// miniMapRemotePlayer3Sprite = new Sprite(Assets.onePixelTexture);
+			// miniMapRemotePlayer3Sprite.setColor(Color.MAGENTA);
+			// miniMapRemotePlayer3Sprite.scale(3f);
+		}
 	}
 
 	public void draw() {
@@ -93,10 +109,58 @@ public class HUD {
 			stage.draw();
 	}
 
-	public void drawMiniMap(CaveMap caveMap, Vector2 playerPos, int waterLevel) {
+	public void drawMiniMap(CaveMap caveMap, Vector2 playerPos,
+			Vector2[] remotePlayersPos, int waterLevel) {
 		// minimapCamera.update();
 		// minimapBatch.setProjectionMatrix(minimapCamera.combined);
 
+		miniMapOffsetX = (w - (caveMap.getWidth() + (w / 50)));
+		miniMapOffsetY = h / 50;
+
+		minimapBatch.begin();
+		for (int x = 0; x < caveMap.getWidth(); x++) {
+			for (int y = 0; y < caveMap.getHeight(); y++) {
+				if (caveMap.getCellAt(x, y).getCellType() == CellType.WALL) {
+					minimapBatch.setColor(Color.BLACK);
+				} else if (y >= waterLevel) {
+					minimapBatch.setColor(0, 166, 255, 255);
+				} else {
+					minimapBatch.setColor(Color.WHITE);
+				}
+				minimapBatch.draw(Assets.onePixelTexture, x + miniMapOffsetX, y
+						+ miniMapOffsetY);
+			}
+		}
+
+		miniMapPlayerSprite.setPosition(miniMapOffsetX + playerPos.x,
+				miniMapOffsetY + playerPos.y);
+		miniMapPlayerSprite.draw(minimapBatch);
+
+		if (remotePlayersPos[0] != null) {
+			miniMapRemotePlayer1Sprite.setPosition(miniMapOffsetX
+					+ remotePlayersPos[0].x, miniMapOffsetY
+					+ remotePlayersPos[0].y);
+			// System.out.println("remote player pos: " + remotePlayersPos[0]);
+			miniMapRemotePlayer1Sprite.draw(minimapBatch);
+		}
+		//
+		// if (remotePlayersPos[1] != null) {
+		// miniMapRemotePlayer2Sprite.setPosition(miniMapOffsetX
+		// + remotePlayersPos[1].x, miniMapOffsetY
+		// + remotePlayersPos[1].y);
+		// miniMapRemotePlayer2Sprite.draw(minimapBatch);
+		// }
+		//
+		// if (remotePlayersPos[2] != null) {
+		// miniMapRemotePlayer3Sprite.setPosition(miniMapOffsetX
+		// + remotePlayersPos[2].x, miniMapOffsetY
+		// + remotePlayersPos[2].y);
+		// miniMapRemotePlayer3Sprite.draw(minimapBatch);
+		// }
+		minimapBatch.end();
+	}
+
+	public void drawMiniMap(CaveMap caveMap, Vector2 playerPos, int waterLevel) {
 		miniMapOffsetX = (w - (caveMap.getWidth() + (w / 50)));
 		miniMapOffsetY = h / 50;
 
@@ -130,11 +194,17 @@ public class HUD {
 
 		font.draw(hudBatch, "player body pos: "
 				+ player.getBody().getPosition(), 20, h - 40);
-		font.draw(hudBatch, "num of other players: " + NetworkData.players.size(), 20, h - 60);
-		font.draw(hudBatch, "roomProps: " + NetworkData.roomProperties.toString(), 20, h - 80);
-//		font.draw(hudBatch,
-//				"angleDeg: " + Math.toDegrees(player.getBody().getAngle()), 20,
-//				h - 80);
+		if (Globals.isCurrentGameMultiplayer) {
+			font.draw(hudBatch,
+					"num of other players: " + NetworkData.players.size(), 20,
+					h - 60);
+			font.draw(hudBatch,
+					"roomProps: " + NetworkData.roomProperties.toString(), 20,
+					h - 80);
+		}
+		// font.draw(hudBatch,
+		// "angleDeg: " + Math.toDegrees(player.getBody().getAngle()), 20,
+		// h - 80);
 		font.draw(hudBatch, "bodies: " + world.getBodyCount(), 20, h - 100);
 
 		hudBatch.end();

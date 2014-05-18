@@ -2,7 +2,7 @@ package kryonet;
 
 import java.io.IOException;
 
-import caveGame.NetworkData;
+import multiplayer.NetworkData;
 
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
@@ -43,10 +43,21 @@ public class NetworkClient extends Listener {
 		} else if (o instanceof PlayerRemoveRequest) {
 			PlayerRemoveRequest req = (PlayerRemoveRequest) o;
 			NetworkData.players.remove(req.id);
-		} else if (o instanceof PlayerUpdateRequest) {
-			PlayerUpdateRequest req = (PlayerUpdateRequest) o;
+		} else if (o instanceof PlayerPositionUpdateRequest) {
+			PlayerPositionUpdateRequest req = (PlayerPositionUpdateRequest) o;
 			NetworkData.players.get(req.id).x = req.x;
 			NetworkData.players.get(req.id).y = req.y;
+		} else if (o instanceof PlayerMouseUpdateRequest) {
+			PlayerMouseUpdateRequest req = (PlayerMouseUpdateRequest) o;
+			NetworkData.players.get(req.id).mouseX = req.mouseX;
+			NetworkData.players.get(req.id).mouseY = req.mouseY;
+		} else if (o instanceof PlayerKeyDownUpdateRequest) {
+			PlayerKeyDownUpdateRequest req = (PlayerKeyDownUpdateRequest) o;
+			NetworkData.players.get(req.id).lastKeyDown = req.lastKeyDown;
+			System.out.println("Got keydown event");
+		} else if (o instanceof PlayerKeyUpUpdateRequest) {
+			PlayerKeyUpUpdateRequest req = (PlayerKeyUpUpdateRequest) o;
+			NetworkData.players.get(req.id).lastKeyUp = req.lastKeyUp;
 		} else if (o instanceof PropertiesResponse) {
 			PropertiesResponse resp = (PropertiesResponse) o;
 			NetworkData.roomProperties = resp.roomProperties;

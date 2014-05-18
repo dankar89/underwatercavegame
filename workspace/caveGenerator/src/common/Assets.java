@@ -60,7 +60,7 @@ public class Assets {
 	public static TextFieldStyle textFieldStyle;
 
 	public static Skin defaultSkin;
-	
+
 	public static void load() {
 		assetManager = new AssetManager();
 		loadResources();
@@ -68,7 +68,7 @@ public class Assets {
 	}
 
 	private static void loadResources() {
-		
+
 		font1 = new BitmapFont(Gdx.files.internal("data/myFont.fnt"),
 				Gdx.files.internal("data/myFont.png"), false);
 		font1.setColor(Color.GREEN);
@@ -76,17 +76,17 @@ public class Assets {
 				.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
 
 		defaultSkin = new Skin(Gdx.files.internal("skins/uiskin.json"));
-		
+
 		labelStyle = new LabelStyle(font1, Color.YELLOW);
 		buttonStyle = new TextButtonStyle();
 		buttonStyle.font = font1;
 		buttonStyle.overFontColor = Color.RED;
 		buttonStyle.fontColor = Color.WHITE;
-		
+
 		selectBoxStyle = new SelectBoxStyle();
 		selectBoxStyle.font = font1;
 		selectBoxStyle.fontColor = Color.WHITE;
-		
+
 		textFieldStyle = new TextFieldStyle();
 		textFieldStyle.font = font1;
 		textFieldStyle.fontColor = Color.WHITE;
@@ -99,6 +99,8 @@ public class Assets {
 
 		assetManager.load("data/whitesquare.png", Texture.class);
 
+		assetManager.load("data/test.png", Texture.class);
+		
 		assetManager.load("hud/onePixel.png", Texture.class);
 
 		assetManager.load("textures/player6.png", Texture.class);
@@ -111,7 +113,7 @@ public class Assets {
 		// load the vertex data for the tiles
 		shapeDataMap = PhysicsDataJsonParser.parse("data/physicsData.json");
 
-		// testPlayer = assetManager.get("textures/player6.png");
+		testPlayer = assetManager.get("data/test.png");
 		onePixelTexture = assetManager.get("hud/onePixel.png");
 		tilesAtlas = assetManager.get("textures/terrain/tiles128.txt");
 		spriteAtlas = assetManager.get("textures/diver/test/diver64.txt");

@@ -57,7 +57,7 @@ public class GameScreen implements Screen {
 
 	public GameScreen(CaveGame game) {
 		this.game = game;
-
+		Globals.isCurrentGameMultiplayer = false;
 		state = GameState.GAME_READY;
 
 		shapeRenderer = new ShapeRenderer();
@@ -80,7 +80,12 @@ public class GameScreen implements Screen {
 
 		batch = new SpriteBatch();
 
-		mapManager = new MapManager(mapWidth, mapHeight, camera);
+		int maxWaterLevel = GameConstants.WATER_LEVEL_MEDIUM_MAX;
+		int minWaterLevel = GameConstants.WATER_LEVEL_MEDIUM_MIN;
+		int waterLevel = Globals.random
+				.nextInt((minWaterLevel - maxWaterLevel) + 1) + maxWaterLevel;
+
+		mapManager = new MapManager(mapWidth, mapHeight, waterLevel, camera);
 		mapManager.generateMap(physics.getWorld());
 
 		minCamPos = new Vector2(w / (GameConstants.TILE_SIZE * 2), h
@@ -91,8 +96,6 @@ public class GameScreen implements Screen {
 				((mapWidth / 2) - 3) + .5f, 1.5f));
 
 		hud = new HUD(w, h);
-
-		batch = new SpriteBatch();
 
 		backgoundColor = Color.GRAY;
 
@@ -108,7 +111,7 @@ public class GameScreen implements Screen {
 
 	private void setupLighting() {
 		RayHandler.setGammaCorrection(true);
-		RayHandler.useDiffuseLight(true);
+		RayHandler.useDiffuseLight(true);		
 		rayHandler = new RayHandler(physics.getWorld());
 		rayHandler.getLightMapTexture().setFilter(TextureFilter.Nearest,
 				TextureFilter.Nearest);

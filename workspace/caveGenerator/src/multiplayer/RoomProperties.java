@@ -1,4 +1,4 @@
-package caveGame;
+package multiplayer;
 
 public class RoomProperties {
 

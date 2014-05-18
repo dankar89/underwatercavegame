@@ -27,4 +27,12 @@ public final class Globals {
 		}
 		return sb.toString().substring(0, numchars);
 	}
+
+	public static boolean isCurrentGameMultiplayer = false;
+
+	public enum FixtureUserData {
+		PLAYER_FOOT_SENSOR,
+	}
+	
+	public static int numOfFootContacts = 0; 
 }

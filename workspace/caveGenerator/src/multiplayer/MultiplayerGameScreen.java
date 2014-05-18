@@ -1,10 +1,19 @@
-package caveGame;
+package multiplayer;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+
+import kryonet.NetworkPlayer;
 
 import org.json.JSONObject;
 
 import box2dLight.RayHandler;
+
+import caveGame.CaveGame;
+import caveGame.GameInputProcessor;
+import caveGame.MainMenuScreen;
+import caveGame.PhysicsManager;
+import caveGame.Player;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -43,7 +52,8 @@ public class MultiplayerGameScreen implements Screen {
 	private HUD hud;
 
 	private Player player;
-	private Vector2 player2Pos;
+	private ArrayList<RemotePlayer> networkPlayers = new ArrayList<RemotePlayer>();
+	// private RemotePlayer remotePlayer1;
 
 	private Vector2 minCamPos, maxCamPos, camPos, mouseWorldPos;
 
@@ -61,6 +71,7 @@ public class MultiplayerGameScreen implements Screen {
 	public MultiplayerGameScreen(CaveGame game) {
 		this.game = game;
 
+		Globals.isCurrentGameMultiplayer = true;
 		state = GameState.GAME_READY;
 
 		shapeRenderer = new ShapeRenderer();
@@ -70,6 +81,24 @@ public class MultiplayerGameScreen implements Screen {
 
 		mapWidth = 100;
 		mapHeight = 100;
+
+		String waterLevelString = NetworkData.roomProperties.get("waterLevel");
+		System.out.println(waterLevelString);
+		int maxWaterLevel = GameConstants.WATER_LEVEL_MEDIUM_MAX;
+		int minWaterLevel = GameConstants.WATER_LEVEL_MEDIUM_MIN;
+		if (waterLevelString.equals("High")) {
+			maxWaterLevel = GameConstants.WATER_LEVEL_HIGH_MAX;
+			minWaterLevel = GameConstants.WATER_LEVEL_HIGH_MIN;
+		} else if (waterLevelString.equals("Medium")) {
+			maxWaterLevel = GameConstants.WATER_LEVEL_MEDIUM_MAX;
+			minWaterLevel = GameConstants.WATER_LEVEL_MEDIUM_MIN;
+		} else if (waterLevelString.equals("Low")) {
+			maxWaterLevel = GameConstants.WATER_LEVEL_LOW_MAX;
+			minWaterLevel = GameConstants.WATER_LEVEL_LOW_MIN;
+		}
+
+		int waterLevel = Globals.random
+				.nextInt((minWaterLevel - maxWaterLevel) + 1) + maxWaterLevel;
 
 		camera = new OrthographicCamera();
 		camera.setToOrtho(true, w / GameConstants.TILE_SIZE, h
@@ -83,7 +112,7 @@ public class MultiplayerGameScreen implements Screen {
 
 		batch = new SpriteBatch();
 
-		mapManager = new MapManager(mapWidth, mapHeight, camera);
+		mapManager = new MapManager(mapWidth, mapHeight, waterLevel, camera);
 		mapManager.generateMap(physics.getWorld());
 
 		minCamPos = new Vector2(w / (GameConstants.TILE_SIZE * 2), h
@@ -93,7 +122,10 @@ public class MultiplayerGameScreen implements Screen {
 		player = new Player(physics.getWorld(), rayHandler, new Vector2(
 				((mapWidth / 2) - 3) + .5f, 1.5f));
 
-		player2Pos = Vector2.Zero;
+		for (NetworkPlayer p : NetworkData.players.values()) {
+			networkPlayers.add(new RemotePlayer(physics.getWorld(), rayHandler,
+					new Vector2(((mapWidth / 2) - 3) + .5f, 1.5f)));
+		}
 
 		hud = new HUD(w, h);
 
@@ -165,6 +197,10 @@ public class MultiplayerGameScreen implements Screen {
 
 		player.update(0, mouseWorldPos, mapManager.getWaterLevel());
 
+		for (RemotePlayer p : networkPlayers) {
+			p.update(mapManager.getWaterLevel());
+		}
+
 		if (Gdx.input.isKeyPressed(Keys.C)) {
 			camera.zoom -= 0.02f;
 		}
@@ -200,6 +236,9 @@ public class MultiplayerGameScreen implements Screen {
 		mapManager.renderBackgroundlayers(camera);
 
 		batch.begin();
+		for (RemotePlayer p : networkPlayers) {
+			p.draw(batch);
+		}
 		player.draw(batch);
 		batch.end();
 
@@ -211,7 +250,15 @@ public class MultiplayerGameScreen implements Screen {
 
 		if (!Globals.hideUI) {
 			hud.draw();
-			hud.drawMiniMap(mapManager.getCaveMap(), player.getPos(),
+
+			Vector2[] posArray = new Vector2[3];
+			int idx = 0;
+			for (RemotePlayer p : networkPlayers) {
+				posArray[idx] = p.getPos();
+				idx++;
+			}
+
+			hud.drawMiniMap(mapManager.getCaveMap(), player.getPos(), posArray,
 					mapManager.getWaterLevel());
 
 			if (Globals.debug) {

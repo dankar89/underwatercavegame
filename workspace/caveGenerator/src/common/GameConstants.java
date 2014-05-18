@@ -1,5 +1,6 @@
 package common;
 
+
 public final class GameConstants {
 	public static final int PIXELS_PER_METER = 64;
 	public static final int TILE_SIZE = 128;
@@ -24,4 +25,13 @@ public final class GameConstants {
 															// to make colors
 															// stand out more.
 	public static final int FOREGROUND_LAYER_4_INDEX = 6; // walls overlay
+	
+	
+	//Low value means a high waterlevel
+	public static final int WATER_LEVEL_HIGH_MAX = 10;
+	public static final int WATER_LEVEL_HIGH_MIN = 20;
+	public static final int WATER_LEVEL_MEDIUM_MAX = 20;
+	public static final int WATER_LEVEL_MEDIUM_MIN = 35;
+	public static final int WATER_LEVEL_LOW_MAX = 35;
+	public static final int WATER_LEVEL_LOW_MIN = 50;
 }

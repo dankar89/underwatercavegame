@@ -1,4 +1,4 @@
-package caveGame;
+package multiplayer;
 
 import java.util.HashMap;
 import java.util.Map;
