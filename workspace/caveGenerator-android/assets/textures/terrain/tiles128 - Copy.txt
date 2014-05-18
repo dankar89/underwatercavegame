@@ -2,37 +2,86 @@ tiles128.png
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-rocks
+corner
+  rotate: false
+  xy: 267, 795
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: 6
+horizontalTile
+  rotate: false
+  xy: 795, 135
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: 1
+lonelyVerticalTile
+  rotate: false
+  xy: 135, 135
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: 2
+verticalTile
+  rotate: false
+  xy: 3, 795
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: 1
+lonelyTile
   rotate: false
   xy: 135, 399
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
-  index: 6
-ugly_bat
-  rotate: false
-  xy: 135, 3
-  size: 128, 128
-  orig: 128, 128
-  offset: 0, 0
-  index: -1
+  index: 3
 corner
   rotate: false
-  xy: 795, 399
+  xy: 399, 399
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
-  index: 6
-lonelyTile
+  index: 1
+corner
   rotate: false
-  xy: 267, 267
+  xy: 399, 267
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
-  index: 3
-chrystal
+  index: 5
+rocks
   rotate: false
-  xy: 663, 663
+  xy: 795, 3
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: 1
+waterSurfaceMedium
+  rotate: false
+  xy: 3, 135
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: 1
+seaweed
+  rotate: false
+  xy: 531, 3
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: 1
+horizontalTile
+  rotate: false
+  xy: 399, 135
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: 4
+lonelyVerticalTile
+  rotate: false
+  xy: 135, 267
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
@@ -44,34 +93,41 @@ waterSurfaceLow
   orig: 128, 128
   offset: 0, 0
   index: 1
-seaweed
+empty
   rotate: false
-  xy: 795, 3
-  size: 128, 128
-  orig: 128, 128
-  offset: 0, 0
-  index: 1
-horizontalTile
-  rotate: false
-  xy: 399, 267
-  size: 128, 128
-  orig: 128, 128
-  offset: 0, 0
-  index: 4
-corner
-  rotate: false
-  xy: 531, 795
-  size: 128, 128
-  orig: 128, 128
-  offset: 0, 0
-  index: 3
-diamond
-  rotate: false
-  xy: 531, 399
+  xy: 267, 531
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
+lonelyTile
+  rotate: false
+  xy: 135, 531
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: 2
+corner
+  rotate: false
+  xy: 531, 267
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: 4
+rocks
+  rotate: false
+  xy: 663, 3
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: 2
+horizontalTile
+  rotate: false
+  xy: 531, 135
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: 3
 verticalTile
   rotate: false
   xy: 3, 531
@@ -79,69 +135,13 @@ verticalTile
   orig: 128, 128
   offset: 0, 0
   index: 3
-rocks
+water
   rotate: false
-  xy: 135, 663
+  xy: 3, 399
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
-  index: 4
-horizontalTile
-  rotate: false
-  xy: 795, 267
-  size: 128, 128
-  orig: 128, 128
-  offset: 0, 0
-  index: 1
-horizontalTileOverlay
-  rotate: false
-  xy: 399, 399
-  size: 128, 128
-  orig: 128, 128
-  offset: 0, 0
-  index: 1
-rocks
-  rotate: false
-  xy: 135, 267
-  size: 128, 128
-  orig: 128, 128
-  offset: 0, 0
-  index: 7
-lonelyCeiling
-  rotate: false
-  xy: 267, 795
-  size: 128, 128
-  orig: 128, 128
-  offset: 0, 0
-  index: 1
-rocks
-  rotate: false
-  xy: 135, 531
-  size: 128, 128
-  orig: 128, 128
-  offset: 0, 0
-  index: 5
-lonelyVerticalTile
-  rotate: false
-  xy: 663, 135
-  size: 128, 128
-  orig: 128, 128
-  offset: 0, 0
-  index: 2
-horizontalTile
-  rotate: false
-  xy: 663, 267
-  size: 128, 128
-  orig: 128, 128
-  offset: 0, 0
-  index: 2
-corner
-  rotate: false
-  xy: 531, 531
-  size: 128, 128
-  orig: 128, 128
-  offset: 0, 0
-  index: 5
+  index: -1
 waterSurface
   rotate: false
   xy: 3, 3
@@ -149,65 +149,65 @@ waterSurface
   orig: 128, 128
   offset: 0, 0
   index: 1
-rocks
+horizontalTileOverlay
   rotate: false
-  xy: 267, 135
+  xy: 267, 267
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: 1
+lonelyTile
+  rotate: false
+  xy: 135, 663
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: 1
+lonelyCeiling
+  rotate: false
+  xy: 135, 795
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: 2
 corner
   rotate: false
-  xy: 663, 399
-  size: 128, 128
-  orig: 128, 128
-  offset: 0, 0
-  index: 7
-rocks
-  rotate: false
-  xy: 135, 795
+  xy: 663, 267
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: 3
-lonelyTile
+corner
+  rotate: false
+  xy: 267, 663
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: 7
+shop
+  rotate: false
+  xy: 399, 3
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+entrance
   rotate: false
   xy: 267, 399
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
-  index: 2
-lonelyCeiling
+  index: -1
+horizontalTile
   rotate: false
-  xy: 267, 663
+  xy: 663, 135
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: 2
 thinHorizontalTile
   rotate: false
-  xy: 531, 3
-  size: 128, 128
-  orig: 128, 128
-  offset: 0, 0
-  index: 1
-enemy
-  rotate: false
-  xy: 399, 663
-  size: 128, 128
-  orig: 128, 128
-  offset: 0, 0
-  index: 1
-corner
-  rotate: false
-  xy: 663, 531
-  size: 128, 128
-  orig: 128, 128
-  offset: 0, 0
-  index: 2
-resource
-  rotate: false
-  xy: 531, 135
+  xy: 267, 3
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
@@ -219,108 +219,24 @@ verticalTile
   orig: 128, 128
   offset: 0, 0
   index: 2
-rocks
+lonelyCeiling
   rotate: false
-  xy: 399, 135
+  xy: 267, 135
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: 1
-shop
-  rotate: false
-  xy: 663, 3
-  size: 128, 128
-  orig: 128, 128
-  offset: 0, 0
-  index: -1
-waterSurfaceMedium
-  rotate: false
-  xy: 3, 135
-  size: 128, 128
-  orig: 128, 128
-  offset: 0, 0
-  index: 1
-rocks
-  rotate: false
-  xy: 135, 135
-  size: 128, 128
-  orig: 128, 128
-  offset: 0, 0
-  index: 8
-lonelyTile
-  rotate: false
-  xy: 267, 531
-  size: 128, 128
-  orig: 128, 128
-  offset: 0, 0
-  index: 1
-water
-  rotate: false
-  xy: 3, 399
-  size: 128, 128
-  orig: 128, 128
-  offset: 0, 0
-  index: -1
-entrance
-  rotate: false
-  xy: 399, 531
-  size: 128, 128
-  orig: 128, 128
-  offset: 0, 0
-  index: -1
-verticalTile
-  rotate: false
-  xy: 3, 795
-  size: 128, 128
-  orig: 128, 128
-  offset: 0, 0
-  index: 1
-horizontalTile
-  rotate: false
-  xy: 531, 267
-  size: 128, 128
-  orig: 128, 128
-  offset: 0, 0
-  index: 3
-lonelyVerticalTile
-  rotate: false
-  xy: 795, 135
-  size: 128, 128
-  orig: 128, 128
-  offset: 0, 0
-  index: 1
-empty
-  rotate: false
-  xy: 399, 795
-  size: 128, 128
-  orig: 128, 128
-  offset: 0, 0
-  index: -1
-corner
-  rotate: false
-  xy: 531, 663
-  size: 128, 128
-  orig: 128, 128
-  offset: 0, 0
-  index: 4
 thinVerticalTile
   rotate: false
-  xy: 399, 3
+  xy: 135, 3
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: 1
 corner
   rotate: false
-  xy: 795, 531
+  xy: 795, 267
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
-  index: 1
-torch
-  rotate: false
-  xy: 267, 3
-  size: 128, 128
-  orig: 128, 128
-  offset: 0, 0
-  index: -1
+  index: 2

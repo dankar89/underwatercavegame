@@ -294,6 +294,7 @@ public class GameScreen implements Screen {
 		physics.dispose();
 		rayHandler.dispose();
 		shapeRenderer.dispose();
+		player.dispose();
 	}
 
 	private void setCameraPos(float x, float y) {

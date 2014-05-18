@@ -14,6 +14,10 @@ public final class Globals {
 	public static boolean lightsEnabled = true;
 	public static boolean fullscreen = false;
 	public static float cameraZoom = 0;
+	
+	public static short PLAYER_SENSOR_CATEGORY_BITS = 0x0002;
+	public static short PLAYER_SENSOR_MASK_BITS = 0x0004;
+	public static short PLAYER_SENSOR_GROUP_INDEX = 0x000;
 
 	public static SecureRandom random = new SecureRandom();
 
