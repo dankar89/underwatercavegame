@@ -11,6 +11,8 @@ import com.badlogic.gdx.utils.Json.Serializable;
 import com.badlogic.gdx.utils.JsonValue;
 import com.me.cavegenerator.Cell.CellType;
 import com.me.cavegenerator.Cell.WallType;
+import common.GameConstants;
+import common.Globals;
 
 public class CaveMap implements Serializable {
 	public enum MapCellType {
@@ -28,16 +30,18 @@ public class CaveMap implements Serializable {
 
 	private ArrayList<Miner> miners = new ArrayList<Miner>();
 	private Miner startMiner;
+	private Vector2 playerStartPos;
+	
+	private int waterLevel;
 
-	// 1 = wall, 0 = empty, 2 = entrance, 3 = shop
+	// 1 = wall, 0 = empty, 2 = entrance, 3 = shop, 4 = player start pos, 9 = connects to the map
 	private int[][] startArea = { 
-			{ 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-			{ 1, 1, 0, 0, 0, 0, 0, 0, 0 },
-			{ 1, 1, 2, 0, 3, 0, 0, 0, 0 },
-			{ 1, 1, 1, 1, 1, 1, 1, 0, 0 },
-			{ 1, 1, 1, 1, 1, 1, 1, 0, 0 },
-			{ 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-			};
+			{1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+			{9, 0, 1, 0, 0, 1, 0, 0, 0, 9 }, 
+			{9, 0, 0, 2, 0, 3, 0, 0, 0, 9 },
+			{9, 0, 1, 1, 1, 1, 1, 1, 0, 9 }, 
+			{9, 0, 1, 1, 1, 1, 1, 1, 0, 9 },
+			{9, 0, 0, 1, 1, 1, 1, 0, 0, 9 }, };
 	private int startAreaWidth;
 	private int startAreaHeight;
 	private int mapHalfWidth;
@@ -63,6 +67,39 @@ public class CaveMap implements Serializable {
 		}
 
 		return new Vector2(mapWidth / 2, 1);
+	}
+	
+	public Vector2 getPlayerStartPos(){
+		return playerStartPos;
+	}
+
+	public Vector2 getHighestPointInCenter(){
+		int xOffset = mapWidth / 5;
+		int yOffset = startAreaHeight+1;
+		for (int y = yOffset; y < this.mapHeight; y++) {
+			for (int x = xOffset; x < this.mapWidth - xOffset; x++) {
+				if (mapArray[x][y].getCellType() == CellType.EMPTY){
+					System.out.println("highest point in center: " + mapArray[x][y].getPos());
+					return mapArray[x][y].getPos();
+				}
+			}
+		}
+		//should never get here!
+		return null;
+	}
+	
+	public Vector2 getDeepestPointInCenter(){
+		int xOffset = mapWidth / 5;
+		for (int y =mapHeight-1; y > 1; y--) {
+			for (int x = xOffset; x < this.mapWidth - xOffset; x++) {
+				if (mapArray[x][y].getCellType() == CellType.EMPTY){
+					System.out.println("deepest point in center: " + mapArray[x][y].getPos());
+					return mapArray[x][y].getPos();
+				}
+			}
+		}
+		//should never get here!
+		return null;
 	}
 
 	public CaveMap(int width, int height, int smoothness) {
@@ -103,11 +140,28 @@ public class CaveMap implements Serializable {
 
 	private void createStartArea() {
 
-		// CellType cellType = null;
 		Cell cell = null;
 		int startAreaX = 0, startAreaY = 0;
+		
+		Vector2 highestPoint = getHighestPointInCenter();
+		
+		
+		//not needed
+		if(highestPoint.x + startAreaWidth < mapWidth){
+			startX = (int) highestPoint.x; //this assumes that the lower-left cell in the start area is empty.
+		} else {
+			startX = (int) (highestPoint.x - startAreaWidth-1); //this assumes that the bottom-right cell in the start area is empty.
+		}
+		
+		startY = (int) highestPoint.y;
 
-		if ((startX >= 0 && endX < mapWidth) && startY >= 0 && endY < mapHeight) {
+		
+		startY = (int) (highestPoint.y - startAreaHeight);
+		endX = startX + startAreaWidth-1;
+		endY = startY + startAreaHeight-1;
+		
+		
+//		if ((startX >= 0 && endX < mapWidth) && startY >= 0 && endY < mapHeight) {
 			for (int x = startX; x <= endX; x++) {
 				for (int y = startY; y <= endY; y++) {
 					if (startArea[startAreaY][startAreaX] == 1) {
@@ -116,13 +170,12 @@ public class CaveMap implements Serializable {
 						String prop = "";
 						if (startArea[startAreaY][startAreaX] == 2) {
 							prop = "entrance";
+							playerStartPos = new Vector2(x, y);
 						} else if (startArea[startAreaY][startAreaX] == 3) {
 							prop = "shop";
 						}
-						
+
 						cell = new Cell(CellType.EMPTY, x, y, prop);
-						
-							
 					}
 					mapArray[x][y] = cell;
 					startAreaY++;
@@ -130,7 +183,7 @@ public class CaveMap implements Serializable {
 				startAreaY = 0;
 				startAreaX++;
 			}
-		}
+//		}
 	}
 
 	public boolean isReady() {
@@ -185,6 +238,7 @@ public class CaveMap implements Serializable {
 			return false;
 
 	}
+
 
 	public WallType findWallType(Cell cell) {
 
@@ -369,24 +423,28 @@ public class CaveMap implements Serializable {
 
 	public void cleanUp(int smoothness) {
 		ArrayList<Cell> adjacentWalls = new ArrayList<Cell>();
-		// ArrayList<Cell> corners = new ArrayList<Cell>();
 
 		Cell currentCell = null;
-
+		
+		Vector2 deepestPoint = getDeepestPointInCenter();
+		Vector2 highestPoint = getHighestPointInCenter();
+		int caveDepth = (int) (deepestPoint.y - highestPoint.y);
+		System.out.println("caveDepth: " + caveDepth);
+		int maxWaterLevel = (int) highestPoint.y + (caveDepth/8);			
+		int minWaterLevel = (int) deepestPoint.y - (caveDepth/4);
+//		int maxWaterLevel = 20;			
+//		int minWaterLevel = 130;
+		
+		System.out.println("max: " + maxWaterLevel + ", min: " + minWaterLevel);
+		waterLevel = Globals.random
+				.nextInt((minWaterLevel - maxWaterLevel) + 1) + maxWaterLevel;
+		System.out.println(waterLevel);
+		
 		for (int i = 0; i < smoothness; i++) {
 			for (int x = 0; x < mapWidth; x++) {
 				for (int y = 0; y < mapHeight; y++) {
 					currentCell = getCellAt(x, y);
 					if (currentCell.getCellType() == CellType.WALL) {
-						// adjacentWalls = get8AdjacentCellsOfType(
-						// currentCell.getPos(), CellType.WALL);
-						// if (adjacentWalls.size() <= 2
-						// || adjacentWalls.isEmpty()) {
-						// getCellAt(x, y).setCellType(CellType.EMPTY);
-						// } else if (adjacentWalls.size() >= 6
-						// || adjacentWalls.isEmpty()) {
-						// getCellAt(x, y).setCellType(CellType.WALL);
-						// }
 
 						adjacentWalls = get8AdjacentCellsOfType(
 								currentCell.getPos(), CellType.WALL);
@@ -398,7 +456,7 @@ public class CaveMap implements Serializable {
 								getCellAt(x, y).setCellType(CellType.EMPTY);
 							}
 
-						} else if (adjacentWalls.size() >= 3 /* 5 */) {
+						} else if (adjacentWalls.size() >= 5 /* 5 */) {
 							getCellAt(x, y).setCellType(CellType.WALL);
 						}
 					}
@@ -406,17 +464,12 @@ public class CaveMap implements Serializable {
 			}
 		}
 
-		// this needs to be done after cleanup above and before we set the
-		// walltypes
 		createStartArea();
 
-		// find and set corners
-		// TODO: this loop can probably be removed....
 		for (int x = 0; x < mapWidth; x++) {
 			for (int y = 0; y < mapHeight; y++) {
 				currentCell = getCellAt(x, y);
 				if (currentCell.getCellType() == CellType.WALL) {
-					// if (findCornerType(currentCell) != CornerType.NONE)
 					setCellAt(x, y, findAndUpdateWallType(currentCell));
 				}
 			}
@@ -591,7 +644,8 @@ public class CaveMap implements Serializable {
 		return adjacentCells;
 	}
 
-	public ArrayList<Cell> getAdjacentCellsOfType(Vector2 cellPos, CellType type) {
+	public ArrayList<Cell> getAdjacentCellsOfType(Vector2 cellPos,
+			CellType... types) {
 		ArrayList<Cell> adjacentCells = new ArrayList<Cell>();
 
 		int x = (int) cellPos.x;
@@ -603,21 +657,23 @@ public class CaveMap implements Serializable {
 		int below = y + 1;
 
 		// FIXME: Why do I need -3 here?
-		if (right < mapWidth - 3) {
-			if (getCellAt(right, y).getCellType() == type)
-				adjacentCells.add(getCellAt(right, y));
-		}
-		if (left > 1) {
-			if (getCellAt(left, y).getCellType() == type)
-				adjacentCells.add(getCellAt(left, y));
-		}
-		if (above > 1) {
-			if (getCellAt(x, above).getCellType() == type)
-				adjacentCells.add(getCellAt(x, above));
-		}
-		if (below < mapHeight - 3) {
-			if (getCellAt(x, below).getCellType() == type)
-				adjacentCells.add(getCellAt(x, below));
+		for (CellType cellType : types) {
+			if (right < mapWidth - 3) {
+				if (getCellAt(right, y).getCellType() == cellType)
+					adjacentCells.add(getCellAt(right, y));
+			}
+			if (left > 1) {
+				if (getCellAt(left, y).getCellType() == cellType)
+					adjacentCells.add(getCellAt(left, y));
+			}
+			if (above > 1) {
+				if (getCellAt(x, above).getCellType() == cellType)
+					adjacentCells.add(getCellAt(x, above));
+			}
+			if (below < mapHeight - 3) {
+				if (getCellAt(x, below).getCellType() == cellType)
+					adjacentCells.add(getCellAt(x, below));
+			}
 		}
 
 		return adjacentCells;
@@ -836,5 +892,9 @@ public class CaveMap implements Serializable {
 	public void read(Json json, JsonValue jsonData) {
 		// TODO Auto-generated method stub
 
+	}
+
+	public int getWaterLevel() {
+		return waterLevel;
 	}
 }

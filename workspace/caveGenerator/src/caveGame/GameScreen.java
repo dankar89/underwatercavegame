@@ -38,6 +38,8 @@ public class GameScreen implements Screen {
 
 	private HUD hud;
 
+	private GameMap gameMap;
+
 	private Player player;
 
 	private Vector2 minCamPos, maxCamPos, camPos, mouseWorldPos;
@@ -59,14 +61,17 @@ public class GameScreen implements Screen {
 		this.game = game;
 		Globals.isCurrentGameMultiplayer = false;
 		state = GameState.GAME_READY;
+		//
+		// String seed = "123";
+		// Globals.random.setSeed(seed.hashCode());
 
 		shapeRenderer = new ShapeRenderer();
 
 		w = Gdx.graphics.getWidth();
 		h = Gdx.graphics.getHeight();
 
-		mapWidth = 100;
-		mapHeight = 100;
+		mapWidth = 150;
+		mapHeight = 150;
 
 		camera = new OrthographicCamera();
 		camera.setToOrtho(true, w / GameConstants.TILE_SIZE, h
@@ -79,23 +84,27 @@ public class GameScreen implements Screen {
 		camPos = new Vector2(mapWidth / 2, mapHeight / 2);
 
 		batch = new SpriteBatch();
+		//
+		// int maxWaterLevel = GameConstants.WATER_LEVEL_MEDIUM_MAX;
+		// int minWaterLevel = GameConstants.WATER_LEVEL_MEDIUM_MIN;
+		// int waterLevel = Globals.random
+		// .nextInt((minWaterLevel - maxWaterLevel) + 1) + maxWaterLevel;
 
-		int maxWaterLevel = GameConstants.WATER_LEVEL_MEDIUM_MAX;
-		int minWaterLevel = GameConstants.WATER_LEVEL_MEDIUM_MIN;
-		int waterLevel = Globals.random
-				.nextInt((minWaterLevel - maxWaterLevel) + 1) + maxWaterLevel;
-
-		mapManager = new MapManager(mapWidth, mapHeight, waterLevel, camera);
+		mapManager = new MapManager(mapWidth, mapHeight, camera);
 		mapManager.generateMap(physics.getWorld());
 
 		minCamPos = new Vector2(w / (GameConstants.TILE_SIZE * 2), h
 				/ (GameConstants.TILE_SIZE * 2));
 		maxCamPos = new Vector2(mapWidth - minCamPos.x, mapWidth - minCamPos.y);
 
-		player = new Player(physics.getWorld(), rayHandler, new Vector2(
-				((mapWidth / 2) - 3) + .5f, 1.5f));
+		// player = new Player(physics.getWorld(), rayHandler, new Vector2(
+		// ((mapWidth / 2) - 3) + .5f, 1.5f));
+
+		player = new Player(physics.getWorld(), rayHandler, mapManager
+				.getPlayerStartPos().add(0.5f, 0.735f));
 
 		hud = new HUD(w, h);
+		gameMap = new GameMap(game, mapManager.getCaveMap());
 
 		backgoundColor = Color.GRAY;
 
@@ -111,7 +120,7 @@ public class GameScreen implements Screen {
 
 	private void setupLighting() {
 		RayHandler.setGammaCorrection(true);
-		RayHandler.useDiffuseLight(true);		
+		RayHandler.useDiffuseLight(true);
 		rayHandler = new RayHandler(physics.getWorld());
 		rayHandler.getLightMapTexture().setFilter(TextureFilter.Nearest,
 				TextureFilter.Nearest);
@@ -164,7 +173,7 @@ public class GameScreen implements Screen {
 				(camera.position.y - ((Gdx.graphics.getHeight() / 2) / (float) GameConstants.TILE_SIZE))
 						+ (Gdx.input.getY() / (float) GameConstants.TILE_SIZE));
 
-		player.update(0, mouseWorldPos, mapManager.getWaterLevel());
+		player.update(deltaTime, mouseWorldPos, mapManager.getWaterLevel());
 
 		// setCameraPos(player.getPos().x, player.getPos().y);
 
@@ -175,8 +184,13 @@ public class GameScreen implements Screen {
 		if (Gdx.input.isKeyPressed(Keys.X)) {
 			camera.zoom += 0.02f;
 		}
+		
+		if (Gdx.input.isKeyPressed(Keys.ESCAPE)) {
+			game.setScreen(new MainMenuScreen(game));
+		}
 
-		hud.update(Gdx.graphics.getDeltaTime());
+
+		hud.update(Gdx.graphics.getDeltaTime(), player);
 
 		// Should this be done after rendering?
 		physics.update(1 / 60f, camera);
@@ -211,9 +225,11 @@ public class GameScreen implements Screen {
 		}
 
 		if (!Globals.hideUI) {
-			hud.draw();
+			hud.draw(player);
 			hud.drawMiniMap(mapManager.getCaveMap(), player.getPos(),
 					mapManager.getWaterLevel());
+			
+//			gameMap.draw();
 
 			if (Globals.debug) {
 				hud.drawDebug(player, mapManager, physics.getWorld());
@@ -251,6 +267,7 @@ public class GameScreen implements Screen {
 	@Override
 	public void resize(int width, int height) {
 		hud.resize(width, height);
+		gameMap.resize(width, height);
 
 		camera.setToOrtho(true, width / GameConstants.TILE_SIZE, height
 				/ GameConstants.TILE_SIZE);
@@ -295,6 +312,7 @@ public class GameScreen implements Screen {
 		rayHandler.dispose();
 		shapeRenderer.dispose();
 		player.dispose();
+		gameMap.dispose();
 	}
 
 	private void setCameraPos(float x, float y) {

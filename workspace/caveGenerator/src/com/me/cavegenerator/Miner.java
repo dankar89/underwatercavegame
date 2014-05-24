@@ -65,42 +65,45 @@ public class Miner {
 			// loop until wall is found
 			if (numOfTries == 0) {
 				while (true) { // maybe add timer instead??
-					if(randPos) {
-						//select a random cell and see if it is empty
-						int x = Globals.random.nextInt(caveMap.getWidth()-2) +1;
-						int y = Globals.random.nextInt(caveMap.getHeight()-2) +1;
-						
-						Cell cell = caveMap.getCellAt(x, y);
-						if(cell.getCellType() == CellType.EMPTY) {
-							this.currentPos.set(x, y);
-							return true;
-						}	
-					} else {
+//					if(randPos) {
+//						//select a random cell and see if it is empty
+//						int x = Globals.random.nextInt(caveMap.getWidth()-2) +1;
+//						int y = Globals.random.nextInt(caveMap.getHeight()-2) +1;
+//						
+//						Cell cell = caveMap.getCellAt(x, y);
+//						if(cell.getCellType() == CellType.EMPTY) {
+//							this.currentPos.set(x, y);
+//							return true;
+//						}	
+//					} else {
 						adjacentCells = caveMap.getAdjacentCellsOfType(this.currentPos,
 								CellType.WALL);
 						if (!adjacentCells.isEmpty()) {
 							this.currentPos = adjacentCells.get(Globals.random
 									.nextInt(adjacentCells.size())).getPos();
+							System.out.println("found wall!!!!!!!!!!!!!!!!!!!");
+							awaken();
 							return true;
 						}
 						adjacentCells = caveMap.getAdjacentCells(this.currentPos);
 						Cell rndCell = adjacentCells.get(Globals.random.nextInt(adjacentCells
 								.size()));
 						this.currentPos = rndCell.getPos();
-					}										
+						System.out.println("Looking for wall...");
+//					}										
 				}
 			} else {
-				for (int i = 0; i < numOfTries; i++) {
-					if (!caveMap.getAdjacentCellsOfType(this.currentPos,
-							CellType.WALL).isEmpty()) {
-						return true;
-					}
-
-					adjacentCells = caveMap.getAdjacentCells(this.currentPos);
-					Cell rndCell = adjacentCells.get(Globals.random.nextInt(adjacentCells
-							.size()));
-					this.currentPos = rndCell.getPos();
-				}
+//				for (int i = 0; i < numOfTries; i++) {
+//					if (!caveMap.getAdjacentCellsOfType(this.currentPos,
+//							CellType.WALL).isEmpty()) {
+//						return true;
+//					}
+//
+//					adjacentCells = caveMap.getAdjacentCells(this.currentPos);
+//					Cell rndCell = adjacentCells.get(Globals.random.nextInt(adjacentCells
+//							.size()));
+//					this.currentPos = rndCell.getPos();
+//				}
 			}
 //		}
 		return false;
@@ -115,10 +118,10 @@ public class Miner {
 
 			// get adjacent cells
 			ArrayList<Cell> adjacentCells;
-			if (digDiagonally) {
-				adjacentCells = caveMap.get8AdjacentCellsOfType(currentPos,
-						CellType.WALL);
-			} else {
+//			if (digDiagonally) {
+//				adjacentCells = caveMap.get8AdjacentCellsOfType(currentPos,
+//						CellType.WALL);
+//			} else {
 //				if(rnd.nextFloat() < chanceToDigVertically){
 //					direction.x = rnd.nextInt(3) - 1;
 //					direction.y = rnd.nextInt(2);
@@ -132,14 +135,13 @@ public class Miner {
 						CellType.WALL);	
 //				adjacentCells = caveMap.getAdjacentCellsOfTypeInDirection(currentPos,
 //						CellType.WALL, direction);
-			}
+//			}
 
 			if (adjacentCells.isEmpty()) {
 				kill();
 				digSucccess = false;
 			} else {
 				try {
-					// Dig the current cell
 					int rndIndex = Globals.random.nextInt(adjacentCells.size());
 
 					Vector2 rndCellPos = adjacentCells.get(rndIndex).getPos();

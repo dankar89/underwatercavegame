@@ -1016,6 +1016,68 @@
             <filename>rocks_2.png</filename>
             <filename>entrance.png</filename>
             <filename>shop.png</filename>
+            <filename>rocks_3.png</filename>
+            <filename>rocks_4.png</filename>
+            <filename>rocks_5.png</filename>
+            <filename>rocks_6.png</filename>
+            <filename>rocks_7.png</filename>
+            <filename>rocks_8.png</filename>
+            <filename>rocks_3.png</filename>
+            <filename>rocks_4.png</filename>
+            <filename>rocks_5.png</filename>
+            <filename>rocks_6.png</filename>
+            <filename>rocks_7.png</filename>
+            <filename>rocks_8.png</filename>
+            <filename>rocks_3.png</filename>
+            <filename>rocks_4.png</filename>
+            <filename>rocks_5.png</filename>
+            <filename>rocks_6.png</filename>
+            <filename>rocks_7.png</filename>
+            <filename>rocks_8.png</filename>
+            <filename>rocks_3.png</filename>
+            <filename>rocks_4.png</filename>
+            <filename>rocks_5.png</filename>
+            <filename>rocks_6.png</filename>
+            <filename>rocks_7.png</filename>
+            <filename>rocks_8.png</filename>
+            <filename>rocks_3.png</filename>
+            <filename>rocks_4.png</filename>
+            <filename>rocks_5.png</filename>
+            <filename>rocks_6.png</filename>
+            <filename>rocks_7.png</filename>
+            <filename>rocks_8.png</filename>
+            <filename>rocks_3.png</filename>
+            <filename>rocks_4.png</filename>
+            <filename>rocks_5.png</filename>
+            <filename>rocks_6.png</filename>
+            <filename>rocks_7.png</filename>
+            <filename>rocks_8.png</filename>
+            <filename>torch.png</filename>
+            <filename>chrystal_1.png</filename>
+            <filename>diamond.png</filename>
+            <filename>enemy_1.png</filename>
+            <filename>resource_1.png</filename>
+            <filename>ugly_bat.png</filename>
+            <filename>chrystal_1.png</filename>
+            <filename>diamond.png</filename>
+            <filename>enemy_1.png</filename>
+            <filename>resource_1.png</filename>
+            <filename>ugly_bat.png</filename>
+            <filename>chrystal_1.png</filename>
+            <filename>diamond.png</filename>
+            <filename>enemy_1.png</filename>
+            <filename>resource_1.png</filename>
+            <filename>ugly_bat.png</filename>
+            <filename>chrystal_1.png</filename>
+            <filename>diamond.png</filename>
+            <filename>enemy_1.png</filename>
+            <filename>resource_1.png</filename>
+            <filename>ugly_bat.png</filename>
+            <filename>chrystal_1.png</filename>
+            <filename>diamond.png</filename>
+            <filename>enemy_1.png</filename>
+            <filename>resource_1.png</filename>
+            <filename>ugly_bat.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>

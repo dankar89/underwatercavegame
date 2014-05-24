@@ -1,6 +1,8 @@
 package common;
 
 import multiplayer.NetworkData;
+import caveGame.FlashLight;
+import caveGame.GameMap;
 import caveGame.Player;
 
 import com.badlogic.gdx.Gdx;
@@ -11,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -41,6 +44,8 @@ public class HUD {
 	private Sprite miniMapWallSprite;
 	private float miniMapOffsetX = 0;
 	private float miniMapOffsetY = 0;
+
+	private int flashLightIconIndex = 0;
 
 	public Touchpad getTouchpad() {
 		return touchpad;
@@ -104,9 +109,13 @@ public class HUD {
 		}
 	}
 
-	public void draw() {
+	public void draw(Player player) {
 		if (Globals.isAndroid)
 			stage.draw();
+
+		hudBatch.begin();
+		hudBatch.draw(Assets.flashLight.get(flashLightIconIndex), 20, 20);
+		hudBatch.end();
 	}
 
 	public void drawMiniMap(CaveMap caveMap, Vector2 playerPos,
@@ -202,19 +211,21 @@ public class HUD {
 					"roomProps: " + NetworkData.roomProperties.toString(), 20,
 					h - 80);
 		}
-		// font.draw(hudBatch,
-		// "angleDeg: " + Math.toDegrees(player.getBody().getAngle()), 20,
-		// h - 80);
 		font.draw(hudBatch, "bodies: " + world.getBodyCount(), 20, h - 100);
 
 		hudBatch.end();
 	}
 
-	public void update(float deltaTime) {
+	public void update(float deltaTime, Player player) {
 		if (Globals.isAndroid) {
 			stage.act(deltaTime);
 		} else {
-			// TODO: unfocus touchpad!!!
+			flashLightIconIndex = MathUtils
+					.floorPositive(((player.getFlashLight().getActiveTime() / player
+							.getFlashLight().BATTERY_LIFE) * (Assets.flashLight.size -1)));
+			
+//			flashLightIconIndex = MathUtils.clamp(flashLightIconIndex, 0, Assets.flashLight.size);
+			System.out.println(flashLightIconIndex);
 		}
 	}
 

@@ -20,8 +20,8 @@ timeline0: 0.0
 - Life - 
 lowMin: 0.0
 lowMax: 0.0
-highMin: 200.0
-highMax: 250.0
+highMin: 250.0
+highMax: 500.0
 relative: false
 scalingCount: 3
 scaling0: 1.0
@@ -73,9 +73,9 @@ timeline0: 0.0
 active: true
 lowMin: 0.0
 lowMax: 0.0
-highMin: 0.1
-highMax: 1.0
-relative: false
+highMin: 0.5
+highMax: 0.5
+relative: true
 scalingCount: 1
 scaling0: 1.0
 timelineCount: 1
@@ -88,12 +88,12 @@ highMin: 60.0
 highMax: 120.0
 relative: false
 scalingCount: 3
-scaling0: 0.7254902
-scaling1: 0.39215687
+scaling0: 1.0
+scaling1: 0.29411766
 scaling2: 0.0
 timelineCount: 3
 timeline0: 0.0
-timeline1: 0.20547946
+timeline1: 0.36301368
 timeline2: 1.0
 - Rotation - 
 active: false
@@ -107,7 +107,7 @@ highMin: 1.0
 highMax: 1.0
 relative: false
 scalingCount: 1
-scaling0: 1.0
+scaling0: 0.4117647
 timelineCount: 1
 timeline0: 0.0
 - Tint - 
@@ -136,7 +136,7 @@ timeline3: 1.0
 - Options - 
 attached: true
 continuous: true
-aligned: false
+aligned: true
 additive: true
 behind: false
 - Image Path -

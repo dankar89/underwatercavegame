@@ -97,8 +97,8 @@ public class MultiplayerGameScreen implements Screen {
 			minWaterLevel = GameConstants.WATER_LEVEL_LOW_MIN;
 		}
 
-		int waterLevel = Globals.random
-				.nextInt((minWaterLevel - maxWaterLevel) + 1) + maxWaterLevel;
+//		int waterLevel = Globals.random
+//				.nextInt((minWaterLevel - maxWaterLevel) + 1) + maxWaterLevel;
 
 		camera = new OrthographicCamera();
 		camera.setToOrtho(true, w / GameConstants.TILE_SIZE, h
@@ -112,7 +112,7 @@ public class MultiplayerGameScreen implements Screen {
 
 		batch = new SpriteBatch();
 
-		mapManager = new MapManager(mapWidth, mapHeight, waterLevel, camera);
+		mapManager = new MapManager(mapWidth, mapHeight, camera);
 		mapManager.generateMap(physics.getWorld());
 
 		minCamPos = new Vector2(w / (GameConstants.TILE_SIZE * 2), h
@@ -209,7 +209,7 @@ public class MultiplayerGameScreen implements Screen {
 			camera.zoom += 0.02f;
 		}
 
-		hud.update(Gdx.graphics.getDeltaTime());
+		hud.update(Gdx.graphics.getDeltaTime(), player);
 
 		// Should this be done after rendering?
 		physics.update(1 / 60f, camera);
@@ -249,7 +249,7 @@ public class MultiplayerGameScreen implements Screen {
 		}
 
 		if (!Globals.hideUI) {
-			hud.draw();
+			hud.draw(player);
 
 			Vector2[] posArray = new Vector2[3];
 			int idx = 0;

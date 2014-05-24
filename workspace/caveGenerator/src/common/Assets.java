@@ -5,11 +5,14 @@ import caveGame.TileShapeData;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.loaders.ParticleEffectLoader;
 import com.badlogic.gdx.assets.loaders.SkinLoader;
+import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
@@ -40,6 +43,11 @@ public class Assets {
 	public static Array<AtlasRegion> rockTiles = new Array<AtlasRegion>();
 	public static Array<AtlasRegion> stuffInTheWater = new Array<AtlasRegion>();
 	public static AtlasRegion wallRegion;
+	
+	//hud regions
+	public static Array<AtlasRegion> flashLight = new Array<AtlasRegion>();
+	public static Array<AtlasRegion> fuelGauge = new Array<AtlasRegion>();
+	public static Array<AtlasRegion> heart = new Array<AtlasRegion>();
 
 	// parsed vertices for creation of box2d shapes for the tiles
 	public static ObjectMap<String, TileShapeData> shapeDataMap = new ObjectMap<String, TileShapeData>();
@@ -51,6 +59,8 @@ public class Assets {
 	public static TextureAtlas tilesAtlas;
 	public static TextureAtlas spriteAtlas;
 	public static TextureAtlas playerSpriteAtlas;
+	public static TextureAtlas mapTextureAtlas;
+	public static TextureAtlas hudTextureAtlas;
 
 	public static BitmapFont font1;
 
@@ -58,6 +68,8 @@ public class Assets {
 	public static TextButtonStyle buttonStyle;
 	public static SelectBoxStyle selectBoxStyle;
 	public static TextFieldStyle textFieldStyle;
+
+	public static ParticleEffect jetpackEffect;
 
 	public static Skin defaultSkin;
 
@@ -93,6 +105,10 @@ public class Assets {
 
 		// queue stuff for loading
 		assetManager.load("textures/terrain/tiles128.txt", TextureAtlas.class);
+		
+		assetManager.load("hud/map/map.txt", TextureAtlas.class);
+		assetManager.load("hud/hud.txt", TextureAtlas.class);
+		
 		assetManager
 				.load("textures/diver/test/diver64.txt", TextureAtlas.class);
 		assetManager.load("textures/player/player64.txt", TextureAtlas.class);
@@ -100,10 +116,12 @@ public class Assets {
 		assetManager.load("data/whitesquare.png", Texture.class);
 
 		assetManager.load("data/test.png", Texture.class);
-		
+
 		assetManager.load("hud/onePixel.png", Texture.class);
 
 		assetManager.load("textures/player6.png", Texture.class);
+
+		assetManager.load("effects/jetpack2.p", ParticleEffect.class);
 
 		// do the actual loading
 		assetManager.finishLoading();
@@ -116,6 +134,8 @@ public class Assets {
 		testPlayer = assetManager.get("data/test.png");
 		onePixelTexture = assetManager.get("hud/onePixel.png");
 		tilesAtlas = assetManager.get("textures/terrain/tiles128.txt");
+		mapTextureAtlas = assetManager.get("hud/map/map.txt");
+		hudTextureAtlas = assetManager.get("hud/hud.txt");
 		spriteAtlas = assetManager.get("textures/diver/test/diver64.txt");
 		playerSpriteAtlas = assetManager.get("textures/player/player64.txt");
 
@@ -132,12 +152,18 @@ public class Assets {
 		wallRegion = tilesAtlas.findRegion("empty");
 		waterTexture = tilesAtlas.findRegion("water");
 		waterSurfaceTexture = tilesAtlas.findRegion("waterSurface");
+		
+		flashLight = hudTextureAtlas.findRegions("flashlight");
+		fuelGauge = hudTextureAtlas.findRegions("fuel_gauge");
+		heart = hudTextureAtlas.findRegions("heart_anim");
 
 		// player sprites
 
 		// TODO: Remove this test!!
 		playerSprites = playerSpriteAtlas.findRegions("player");
 		diverSprites = spriteAtlas.findRegions("diver");
+		
+		jetpackEffect = assetManager.get("effects/jetpack2.p");
 	}
 
 	public static void dispose() {

@@ -1,0 +1,60 @@
+map.png
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+wall
+  rotate: false
+  xy: 2, 12
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+entrance_icon
+  rotate: false
+  xy: 20, 2
+  size: 6, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+player2_icon
+  rotate: false
+  xy: 12, 19
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+shop_icon
+  rotate: false
+  xy: 12, 2
+  size: 6, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+water
+  rotate: false
+  xy: 2, 2
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+player3_icon
+  rotate: false
+  xy: 12, 12
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+player1_icon
+  rotate: false
+  xy: 19, 12
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+background
+  rotate: false
+  xy: 2, 22
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1

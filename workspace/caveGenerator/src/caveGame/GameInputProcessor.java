@@ -26,7 +26,9 @@ public class GameInputProcessor implements InputProcessor {
 		case Keys.F5:
 			Globals.fullscreen = !Globals.fullscreen;
 		case Keys.ESCAPE:
-			Gdx.app.exit();
+//			Gdx.app.exit();			
+			break;
+		case Keys.M:
 			break;
 		default:
 			return false;			

@@ -3,8 +3,6 @@ package com.me.cavegenerator;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import multiplayer.NetworkData;
-
 import caveGame.TileShapeData;
 
 import com.badlogic.gdx.Gdx;
@@ -53,11 +51,8 @@ public class MapManager extends InputAdapter {
 	private Iterator<Miner> minerIter;
 	private int digCounter, digFailure;
 	private int createdMiners = 1;
-	private int waterLevel = 10;
 
 	private int mapWidth, mapHeight;
-
-	private Vector2 playerStartPos;
 
 	private int[] backgroundLayers = { GameConstants.BACKGROUND_LAYER_1_INDEX,
 			GameConstants.BACKGROUND_LAYER_2_INDEX,
@@ -74,12 +69,10 @@ public class MapManager extends InputAdapter {
 	PolygonShape boxShape;
 	BodyDef bodyDef;
 
-	public MapManager(int mapWidth, int mapHeight, int waterLevel,
+	public MapManager(int mapWidth, int mapHeight,
 			OrthographicCamera cam) {
 		this.mapWidth = mapWidth;
 		this.mapHeight = mapHeight;
-
-		this.waterLevel = waterLevel;
 
 		boxShape = new PolygonShape();
 		bodyDef = new BodyDef();
@@ -97,20 +90,17 @@ public class MapManager extends InputAdapter {
 
 		caveMap = new CaveMap(mapWidth, mapHeight, 0);
 
-		startMiner = new Miner(caveMap.getMinerStartPos());
+//		startMiner = new Miner(caveMap.getMinerStartPos());
+		startMiner = new Miner(new Vector2(mapWidth / 2, mapHeight / 2));
 		miners.add(startMiner);
 
 		this.map = new TiledMap();
 	}
 
-	private void init() {
-
-	}
-
 	public void generateMap(World world) {
 		// TODO: prevent the minerslist from being be emptied infinitely
 		minerIter = miners.iterator();
-		while (createdMiners < /* 350 */150 && digCounter < 2500) {
+		while (createdMiners < /* 350 */300 ) {
 			while (minerIter.hasNext()) {
 				currentMiner = minerIter.next();
 
@@ -121,8 +111,7 @@ public class MapManager extends InputAdapter {
 					digCounter++;
 				} else {
 					if (miners.size() == 1) {
-						// System.out.println("got here");
-						currentMiner.findWall(caveMap, 0, true);
+						currentMiner.findWall(caveMap, 0, false);
 					} else {
 						minerIter.remove();
 					}
@@ -130,22 +119,15 @@ public class MapManager extends InputAdapter {
 				int rndInt = Globals.random.nextInt(100);
 
 				if (rndInt < 5) {
-					int xDelta = 0;
-					int yDelta = 0;
-					if ((currentMiner.getCurrentPos().x > 0 && currentMiner
-							.getCurrentPos().x < this.mapWidth - 1)
-							&& (currentMiner.getCurrentPos().y > 0 && currentMiner
-									.getCurrentPos().y < this.mapHeight - 1)) {
-						xDelta = Globals.random.nextBoolean() ? 1 : -1;
-						yDelta = Globals.random.nextBoolean() ? 1 : -1;
-					}
-					newMiners.add(new Miner(currentMiner.getCurrentPos().add(
-							xDelta, yDelta)));
+					newMiners.add(new Miner(currentMiner.getCurrentPos()));
 					createdMiners++;
 				}
 			}
 
-			miners.addAll(newMiners);
+			if(!newMiners.isEmpty())
+				miners.addAll(newMiners);
+
+			System.out.println("miners: " + miners.size());
 			minerIter = miners.iterator();
 			newMiners.clear();
 		}
@@ -155,6 +137,43 @@ public class MapManager extends InputAdapter {
 		createTileMap(world);
 		mapGenerationDone = true;
 	}
+
+//	public void generateMap2(World world) {
+//		minerIter = miners.iterator();
+//		int rndInt;
+//		while (createdMiners < 180 && digCounter < 500) {
+//			while (minerIter.hasNext()) {
+//				currentMiner = minerIter.next();
+//					caveMap = currentMiner.dig(caveMap, false, 0);
+//
+//					if (currentMiner.digSucccess) {
+//						digCounter++;
+//					} else {
+//						if (miners.size() == 1) {
+//							currentMiner.findWall(caveMap, 0, false);
+//						} else {
+//							minerIter.remove();
+//						}
+//					}
+//
+//					rndInt = Globals.random.nextInt(100);
+//					if (rndInt < 5) {
+//						newMiners.add(new Miner(currentMiner.getCurrentPos()));
+//						createdMiners++;
+//					}
+//			}
+//
+//			miners.addAll(newMiners);
+//			System.out.println("miners: " + miners.size());
+//			minerIter = miners.iterator();
+//			newMiners.clear();
+//		}
+//		
+//		caveMap.cleanUp(5);
+//
+//		createTileMap(world);
+//		mapGenerationDone = true;
+//	}
 
 	private TiledMapTileLayer createLayer(int layerIndex) {
 		return createLayer(layerIndex, null);
@@ -171,6 +190,8 @@ public class MapManager extends InputAdapter {
 		boolean flipX = false;
 		boolean flipY = false;
 		AtlasRegion tmpRegion = null;
+		
+		int waterLevel = caveMap.getWaterLevel();
 
 		ArrayList<EdgeShape> lineSegments = null;
 
@@ -199,8 +220,6 @@ public class MapManager extends InputAdapter {
 			lineSegments = new ArrayList<EdgeShape>();
 			break;
 		}
-
-		// System.out.println("creating layer: " + layer.getName());
 
 		for (int x = 0; x < mapWidth; x++) {
 			for (int y = 0; y < mapHeight; y++) {
@@ -412,6 +431,8 @@ public class MapManager extends InputAdapter {
 
 	public void createTileMap(World world) {
 		if (this.caveMap.isReady()) {
+
+			
 			this.map = new TiledMap();
 			layers = map.getLayers();
 
@@ -567,7 +588,7 @@ public class MapManager extends InputAdapter {
 	}
 
 	public int getWaterLevel() {
-		return this.waterLevel;
+		return this.caveMap.getWaterLevel();
 	}
 
 	public OrthogonalTiledMapRenderer getRenderer() {
@@ -575,6 +596,6 @@ public class MapManager extends InputAdapter {
 	}
 
 	public Vector2 getPlayerStartPos() {
-		return playerStartPos;
+		return caveMap.getPlayerStartPos();
 	}
 }

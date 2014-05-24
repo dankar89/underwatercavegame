@@ -69,7 +69,8 @@ public class Player extends InputAdapter {
 	private boolean isUsingJetpack;
 
 	private PointLight playerlight;
-	private ConeLight flashlight;
+	// private ConeLight flashlight;
+	private FlashLight flashLight;
 	private float lookAngle = 0;
 
 	private ParticleEffect jetpackEffect;
@@ -132,9 +133,9 @@ public class Player extends InputAdapter {
 		shape.setAsBox(((w / 2) / GameConstants.PIXELS_PER_METER), (h / 6)
 				/ GameConstants.PIXELS_PER_METER, new Vector2(0, .2f), 0);
 		fixDef.density = 0;
-		fixDef.filter.categoryBits = Globals.PLAYER_SENSOR_CATEGORY_BITS;
-		fixDef.filter.groupIndex = Globals.PLAYER_SENSOR_GROUP_INDEX;
-//		fixDef.filter.maskBits = Globals.PLAYER_SENSOR_MASK_BITS;
+		// fixDef.filter.categoryBits = Globals.PLAYER_SENSOR_CATEGORY_BITS;
+		// fixDef.filter.groupIndex = Globals.PLAYER_SENSOR_GROUP_INDEX;
+		// fixDef.filter.maskBits = Globals.PLAYER_SENSOR_MASK_BITS;
 		fixDef.friction = 0;
 		fixDef.shape = shape;
 		fixDef.isSensor = true;
@@ -171,28 +172,32 @@ public class Player extends InputAdapter {
 
 		body.setUserData(animatedBox2dSprite);
 
+		float lightDistance = (Gdx.graphics.getWidth() / Gdx.graphics
+				.getHeight()) * 6.5f;
 		playerlight = new PointLight(rayHandler, 100, new Color(1, 1, 1, 0.2f),
-				8.5f, body.getPosition().x, body.getPosition().y);
-		playerlight.attachToBody(body, 0, 0);
-		Vector2 lightPos = new Vector2(body.getPosition().x,
-				body.getPosition().y);
+				lightDistance, body.getPosition().x, body.getPosition().y);
+		playerlight.attachToBody(body, Box2DUtils.width(body) / 2f,
+				Box2DUtils.height(body) / 2f);
+		// Vector2 lightPos = new Vector2(body.getPosition().x,
+		// body.getPosition().y);
 		Color lightColor = new Color(0.2f, 0.5f, 0.5f, 0.55f);
-		flashlight = new ConeLight(rayHandler, 100, lightColor, 15.0f,
-				lightPos.x, lightPos.y, 0, 20.0f);
+		// flashlight = new ConeLight(rayHandler, 100, lightColor, 15.0f,
+		// lightPos.x, lightPos.y, 0, 20.0f);
 
-		Light.setContactFilter(Globals.PLAYER_SENSOR_CATEGORY_BITS, Globals.PLAYER_SENSOR_GROUP_INDEX, Globals.PLAYER_SENSOR_MASK_BITS);
-		
-		jetpackEffect = new ParticleEffect();
-		jetpackEffect.load(Gdx.files.internal("effects/jetpack2.p"),
-				Gdx.files.internal("effects"));
+		flashLight = new FlashLight(rayHandler, lightColor, getPos());
+
+		Light.setContactFilter(Globals.PLAYER_SENSOR_CATEGORY_BITS,
+				Globals.PLAYER_SENSOR_MASK_BITS,
+				Globals.PLAYER_SENSOR_MASK_BITS);
+
+		jetpackEffect = Assets.jetpackEffect;
 		jetpackEffect.setPosition(body.getPosition().x, body.getPosition().y);
 		jetpackEffect.start();
 	}
 
 	public void update(float detla, Vector2 mouseWorldPos, int waterLevel) {
 		animatedBox2dSprite.update(1 / 60f);
-		jetpackEffect.setPosition(body.getPosition().x, body.getPosition().y);
-		
+
 		if (movingLeft() && movingRight()) {
 			movement.x = 0;
 		} else {
@@ -218,18 +223,14 @@ public class Player extends InputAdapter {
 		if (Globals.isAndroid)
 			flashlightEnabled = true;
 
-		if (Globals.lightsEnabled)
-			flashlight.setActive(isFlashlightEnabled());
-
-		lookAngle = MathUtils.atan2(mouseWorldPos.y - getPos().y,
-				mouseWorldPos.x - getPos().x) * MathUtils.radDeg;
-		flashlight.setDirection(lookAngle);
-		flashlight.setPosition(getPos());
-
-		// if looking left, flip left
-		if (lookAngle < -90 && lookAngle > 90) {
-
+		if (Globals.lightsEnabled) {
+			flashLight.setActive(isFlashlightEnabled());
 		}
+
+		flashLight.update(detla, getPos(), mouseWorldPos);
+		if (!flashLight.hasBattery())
+			flashlightEnabled = false;
+
 
 		if ((int) body.getPosition().y > waterLevel) {
 			body.setGravityScale(0);
@@ -288,6 +289,7 @@ public class Player extends InputAdapter {
 
 	public void jetpackMove(float y) {
 		body.applyForceToCenter(0, y, true);
+		jetpackEffect.setPosition(body.getPosition().x, body.getPosition().y);
 		jetpackEffect.update(Gdx.graphics.getDeltaTime());
 		isUsingJetpack = true;
 	}
@@ -391,50 +393,29 @@ public class Player extends InputAdapter {
 	public Vector2 getPos() {
 		return body.getPosition();
 	}
-
-	// public Vector2 getScreenPos(OrthographicCamera cam) {
-	// // Vector2 topLeft = new Vector2(
-	// // (cam.position.x * GameConstants.TILE_SIZE)
-	// // - Gdx.graphics.getWidth(),
-	// // (cam.position.y * GameConstants.TILE_SIZE)
-	// // - Gdx.graphics.getHeight());
-	// //
-	//
-	// System.out.println("viewport: " + topLeft.toString());
-	// return getPos().scl(GameConstants.PIXELS_PER_METER).sub(topLeft.x,
-	// topLeft.y);
-	// }
+	
+	public FlashLight getFlashLight(){
+		return flashLight;
+	}
 
 	public boolean isFlashlightEnabled() {
 		return flashlightEnabled;
 	}
-
-	// @Override
-	// public boolean scrolled(int amount) {
-	// animatedBox2dSprite.setScale(Globals.cameraZoom - 4);
-	// return false;
-	// }
 
 	@Override
 	public boolean keyDown(int keycode) {
 		switch (keycode) {
 		case Keys.LEFT:
 		case Keys.A:
-			// System.out.println(lookDirection);
-			// System.out.println(animatedBox2dSprite.isFlipX());
 			if (lookDirection == LookDirection.LEFT
 					&& !animatedBox2dSprite.isFlipX()) {
-				// System.out.println("moving left");
 				animatedBox2dSprite.flipFrames(true, false);
 			}
 			break;
 		case Keys.RIGHT:
 		case Keys.D:
-			// System.out.println(lookDirection);
-			// System.out.println(animatedBox2dSprite.isFlipX());
 			if (lookDirection == LookDirection.RIGHT
 					&& animatedBox2dSprite.isFlipX()) {
-				// System.out.println("moving right");
 				animatedBox2dSprite.flipFrames(true, false);
 			}
 			break;
@@ -442,12 +423,19 @@ public class Player extends InputAdapter {
 			body.setAngularVelocity(5f);
 			break;
 		case Keys.F:
-			flashlightEnabled = !flashlightEnabled;
+			if (flashLight.hasBattery()) {
+				flashlightEnabled = !flashlightEnabled;
+			} else {
+				flashlightEnabled = false;
+			}
 			break;
 		case Keys.SPACE:
 			if (!isUnderWater) {
 				if (Globals.numOfFootContacts > 0) {
 					jump();
+				} else {
+					jetpackEffect.reset();
+					canUseJetpack = true;
 				}
 			}
 		default:
@@ -494,7 +482,7 @@ public class Player extends InputAdapter {
 		case Keys.SPACE:
 			if (Globals.numOfFootContacts < 1)
 				jetpackEffect.reset();
-			canUseJetpack = true;
+			// canUseJetpack = true;
 			break;
 		case Keys.R:
 			body.setAngularVelocity(0);
