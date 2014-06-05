@@ -225,7 +225,6 @@ public class HUD {
 							.getFlashLight().BATTERY_LIFE) * (Assets.flashLight.size -1)));
 			
 //			flashLightIconIndex = MathUtils.clamp(flashLightIconIndex, 0, Assets.flashLight.size);
-			System.out.println(flashLightIconIndex);
 		}
 	}
 

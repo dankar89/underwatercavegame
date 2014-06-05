@@ -121,7 +121,7 @@ public class Assets {
 
 		assetManager.load("textures/player6.png", Texture.class);
 
-		assetManager.load("effects/jetpack2.p", ParticleEffect.class);
+		assetManager.load("effects/test.p", ParticleEffect.class);
 
 		// do the actual loading
 		assetManager.finishLoading();
@@ -163,7 +163,7 @@ public class Assets {
 		playerSprites = playerSpriteAtlas.findRegions("player");
 		diverSprites = spriteAtlas.findRegions("diver");
 		
-		jetpackEffect = assetManager.get("effects/jetpack2.p");
+		jetpackEffect = assetManager.get("effects/test.p");
 	}
 
 	public static void dispose() {

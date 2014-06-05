@@ -6,12 +6,13 @@ import box2dLight.RayHandler;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 import common.Globals;
 
 public class FlashLight {
 	private ConeLight light;
 	private float lookAngle = 0;
-	public static final float BATTERY_LIFE = 10; // seconds
+	public static final float BATTERY_LIFE = 40; // seconds
 	public static final float BATTERY_REST_TIME = 3; // seconds
 	public static final float NO_BATTERY_FLICKER_TIME = 1; // seconds
 	private float rechargeMultiplier = 1.3f;
@@ -27,15 +28,23 @@ public class FlashLight {
 		light = new ConeLight(rayHandler, 100, lightColor, 15.0f, lightPos.x,
 				lightPos.y, 0, 20.0f);
 		light.setActive(false);
+		
+	}
+	
+	public FlashLight(RayHandler rayHandler, Color lightColor, Body body) {
+		light = new ConeLight(rayHandler, 100, lightColor, 15.0f, 0,
+				0, 0, 20.0f);
+		light.attachToBody(body, 0, 0);
+		light.setActive(false);
 	}
 
 	public void update(float deltaTime, Vector2 lightPos, Vector2 mouseWorldPos) {
 
 		if (light.isActive()) {
-			lookAngle = MathUtils.atan2(mouseWorldPos.y - lightPos.y,
-					mouseWorldPos.x - lightPos.x) * MathUtils.radDeg;
+			lookAngle = MathUtils.atan2(mouseWorldPos.y - light.getY(),
+					mouseWorldPos.x - light.getX()) * MathUtils.radDeg;
 			light.setDirection(lookAngle);
-			light.setPosition(lightPos);
+//			light.setPosition(lightPos);
 
 			if (activeTime + deltaTime < BATTERY_LIFE) {
 				activeTime += deltaTime;

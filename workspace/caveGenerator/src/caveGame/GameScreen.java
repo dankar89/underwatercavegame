@@ -190,7 +190,7 @@ public class GameScreen implements Screen {
 		}
 
 
-		hud.update(Gdx.graphics.getDeltaTime(), player);
+		hud.update(deltaTime, player);
 
 		// Should this be done after rendering?
 		physics.update(1 / 60f, camera);
@@ -237,25 +237,25 @@ public class GameScreen implements Screen {
 			}
 		}
 
-		batch.begin();
-		switch (state) {
-		case GAME_READY:
-			// presentReady();
-			break;
-		case GAME_RUNNING:
-			// presentRunning();
-			break;
-		case GAME_PAUSED:
-			// presentPaused();
-			break;
-		case GAME_LEVEL_END:
-			// presentLevelEnd();
-			break;
-		case GAME_OVER:
-			// presentGameOver();
-			break;
-		}
-		batch.end();
+//		batch.begin();
+//		switch (state) {
+//		case GAME_READY:
+//			// presentReady();
+//			break;
+//		case GAME_RUNNING:
+//			// presentRunning();
+//			break;
+//		case GAME_PAUSED:
+//			// presentPaused();
+//			break;
+//		case GAME_LEVEL_END:
+//			// presentLevelEnd();
+//			break;
+//		case GAME_OVER:
+//			// presentGameOver();
+//			break;
+//		}
+//		batch.end();
 	}
 
 	@Override

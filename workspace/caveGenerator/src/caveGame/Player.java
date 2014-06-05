@@ -22,6 +22,7 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
+import com.badlogic.gdx.graphics.g2d.ParticleEmitterBox2D;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -73,7 +74,7 @@ public class Player extends InputAdapter {
 	private FlashLight flashLight;
 	private float lookAngle = 0;
 
-	private ParticleEffect jetpackEffect;
+	private JetPack jetPack;
 
 	// DEBUG STUFF
 	public static ArrayList<String> debugStrings = new ArrayList<String>();
@@ -128,7 +129,7 @@ public class Player extends InputAdapter {
 				((h / 2f) / GameConstants.PIXELS_PER_METER), new Vector2(0, 0),
 				0);
 		fixDef.shape = shape;
-		body.createFixture(fixDef);
+		body.createFixture(fixDef);				
 
 		shape.setAsBox(((w / 2) / GameConstants.PIXELS_PER_METER), (h / 6)
 				/ GameConstants.PIXELS_PER_METER, new Vector2(0, .2f), 0);
@@ -184,18 +185,17 @@ public class Player extends InputAdapter {
 		// flashlight = new ConeLight(rayHandler, 100, lightColor, 15.0f,
 		// lightPos.x, lightPos.y, 0, 20.0f);
 
-		flashLight = new FlashLight(rayHandler, lightColor, getPos());
+		flashLight = new FlashLight(rayHandler, lightColor, body);
+//		flashLight = new FlashLight(rayHandler, lightColor, getPos());
 
 		Light.setContactFilter(Globals.PLAYER_SENSOR_CATEGORY_BITS,
 				Globals.PLAYER_SENSOR_MASK_BITS,
 				Globals.PLAYER_SENSOR_MASK_BITS);
 
-		jetpackEffect = Assets.jetpackEffect;
-		jetpackEffect.setPosition(body.getPosition().x, body.getPosition().y);
-		jetpackEffect.start();
+		jetPack = new JetPack(world, body);
 	}
 
-	public void update(float detla, Vector2 mouseWorldPos, int waterLevel) {
+	public void update(float delta, Vector2 mouseWorldPos, int waterLevel) {
 		animatedBox2dSprite.update(1 / 60f);
 
 		if (movingLeft() && movingRight()) {
@@ -227,10 +227,9 @@ public class Player extends InputAdapter {
 			flashLight.setActive(isFlashlightEnabled());
 		}
 
-		flashLight.update(detla, getPos(), mouseWorldPos);
+		flashLight.update(delta, getPos(), mouseWorldPos);
 		if (!flashLight.hasBattery())
 			flashlightEnabled = false;
-
 
 		if ((int) body.getPosition().y > waterLevel) {
 			body.setGravityScale(0);
@@ -240,18 +239,16 @@ public class Player extends InputAdapter {
 				swim(movement.x * 2, movement.y * 2);
 			}
 
-			// body.setFixedRotation(false);
 			isUnderWater = true;
 		} else {
 			if (Gdx.input.isKeyPressed(Keys.SPACE)) {
 				if (canUseJetpack) {
-					jetpackMove(-11f);
+					jetpackMove(-11f, delta);
 				}
 			} else {
 				isUsingJetpack = false;
 			}
 			body.setGravityScale(1);
-			// body.setLinearDamping(2f);
 			move(movement.x);
 			isUnderWater = false;
 		}
@@ -283,14 +280,13 @@ public class Player extends InputAdapter {
 
 	public void jump() {
 		canUseJetpack = false;
-		body.applyLinearImpulse(0, -3.5f, body.getWorldCenter().x,
+		body.applyLinearImpulse(0, -4f, body.getWorldCenter().x,
 				body.getWorldCenter().y, true);
 	}
-
-	public void jetpackMove(float y) {
-		body.applyForceToCenter(0, y, true);
-		jetpackEffect.setPosition(body.getPosition().x, body.getPosition().y);
-		jetpackEffect.update(Gdx.graphics.getDeltaTime());
+	
+	public void jetpackMove(float y, float deltaTime) {
+		body.applyForceToCenter(0, y, true);		
+		jetPack.update(deltaTime, body.getWorldCenter());
 		isUsingJetpack = true;
 	}
 
@@ -372,13 +368,13 @@ public class Player extends InputAdapter {
 	public void scale(float amount) {
 		animatedBox2dSprite.scale(amount);
 	}
-
+	
 	public void draw(SpriteBatch batch) {
-		batch.enableBlending();
+//		batch.enableBlending();
 		animatedBox2dSprite.draw(batch, body);
-
+		
 		if (isUsingJetpack) {
-			jetpackEffect.draw(batch);
+			jetPack.draw(batch);
 		}
 	}
 
@@ -393,8 +389,8 @@ public class Player extends InputAdapter {
 	public Vector2 getPos() {
 		return body.getPosition();
 	}
-	
-	public FlashLight getFlashLight(){
+
+	public FlashLight getFlashLight() {
 		return flashLight;
 	}
 
@@ -434,7 +430,7 @@ public class Player extends InputAdapter {
 				if (Globals.numOfFootContacts > 0) {
 					jump();
 				} else {
-					jetpackEffect.reset();
+					jetPack.reset();
 					canUseJetpack = true;
 				}
 			}
@@ -456,22 +452,10 @@ public class Player extends InputAdapter {
 		case Keys.LEFT:
 		case Keys.A:
 			stop();
-
-			// if(lookDirection == LookDirection.LEFT)
-			// lookDirection =
-			// body.getFixtureList().get(0).setFriction(1.5f);
-			// stop();
-			// if(isMoving)
-			// animatedBox2dSprite.flipFrames(true, false);
 			break;
 		case Keys.RIGHT:
 		case Keys.D:
 			stop();
-			// body.getFixtureList().get(0).setFriction(1.5f);
-			// stop();
-			// if (animatedBox2dSprite.isFlipX())
-			// if(isMoving)
-			// animatedBox2dSprite.flipFrames(true, false);
 			break;
 		case Keys.UP:
 			// stop();
@@ -481,7 +465,7 @@ public class Player extends InputAdapter {
 			break;
 		case Keys.SPACE:
 			if (Globals.numOfFootContacts < 1)
-				jetpackEffect.reset();
+				jetPack.reset();
 			// canUseJetpack = true;
 			break;
 		case Keys.R:
@@ -500,6 +484,6 @@ public class Player extends InputAdapter {
 	}
 
 	public void dispose() {
-		jetpackEffect.dispose();
+		jetPack.dispose();
 	}
 }
